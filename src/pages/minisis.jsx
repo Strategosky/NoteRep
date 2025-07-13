@@ -32,6 +32,308 @@ if (!firebase.apps.length) {
 
 const db = getFirestore()
 
+const student_data = {
+  courses: [
+    {
+      CourseCode: 'CI71',
+      CourseName: 'Multicore Architecture and programming',
+      InternalScore: 48,
+      attendance: 88,
+      credit: 4,
+    },
+    {
+      CourseCode: 'CI72',
+      CourseName: 'Foundations of Computer Vision',
+      InternalScore: 47,
+      attendance: 86,
+      credit: 3,
+    },
+    {
+      CourseCode: 'CIL74',
+      CourseName: 'Containerization Laboratory',
+      InternalScore: 46,
+      attendance: 90,
+      credit: 1,
+    },
+    {
+      CourseCode: 'CIL75',
+      CourseName: 'Skill Enhancement Lab -Generative AI',
+      InternalScore: 45,
+      attendance: 86,
+      credit: 3,
+    },
+    {
+      CourseCode: 'CIE731',
+      CourseName: 'Information Retrieval',
+      InternalScore: 44,
+      attendance: 76,
+      credit: 3,
+    },
+    {
+      CourseCode: 'ETOE02',
+      CourseName: 'Wireless Sensor Networks',
+      InternalScore: 43,
+      attendance: 78,
+      credit: 3,
+    },
+  ],
+  academicHistory: {
+    cumulative: {
+      cgpa: '9.99',
+      creditsEarned: '126',
+      creditsToBeEarned: '34',
+    },
+    semesters: [
+      {
+        cgpa: 0,
+        creditsEarned: '20',
+        creditsRegistered: '20',
+        semester: 'Feb / Mar 2022',
+        sgpa: '8.75',
+      },
+      {
+        cgpa: '8.77',
+        creditsEarned: '16',
+        creditsRegistered: '20',
+        semester: 'July 2022',
+        sgpa: '7.05',
+      },
+      {
+        cgpa: '8.59',
+        creditsEarned: '21',
+        creditsRegistered: '21',
+        semester: 'Jan 2023',
+        sgpa: '8.28',
+      },
+      {
+        cgpa: '8.72',
+        creditsEarned: '22',
+        creditsRegistered: '22',
+        semester: 'May/June 2023',
+        sgpa: '9.04',
+      },
+      {
+        cgpa: '8.69',
+        creditsEarned: '21',
+        creditsRegistered: '21',
+        semester: 'ODD - December 2023',
+        sgpa: '8.71',
+      },
+      {
+        cgpa: '8.80',
+        creditsEarned: '22',
+        creditsRegistered: '22',
+        semester: 'EVEN - May 2024',
+        sgpa: '9.31',
+      },
+    ],
+  },
+  predictions: {
+    atleast: {
+      course_details: [
+        {
+          CourseCode: 'CI71',
+          CourseName: 'Multicore Architecture and programming',
+          Credit: 4,
+          GradePoints: 9,
+          InternalScore_out_of_50: 48,
+          LetterGrade: 'A+',
+          PredictedFinal_out_of_100: 72.6,
+          Total_out_of_100: 84.3,
+        },
+        {
+          CourseCode: 'CI72',
+          CourseName: 'Foundations of Computer Vision',
+          Credit: 3,
+          GradePoints: 7,
+          InternalScore_out_of_50: 37,
+          LetterGrade: 'B+',
+          PredictedFinal_out_of_100: 62.6,
+          Total_out_of_100: 68.3,
+        },
+        {
+          CourseCode: 'CIL74',
+          CourseName: 'Containerization Laboratory',
+          Credit: 1,
+          GradePoints: 9,
+          InternalScore_out_of_50: 50,
+          LetterGrade: 'A+',
+          PredictedFinal_out_of_100: 73.5,
+          Total_out_of_100: 86.7,
+        },
+        {
+          CourseCode: 'CIL75',
+          CourseName: 'Skill Enhancement Lab -Generative AI',
+          Credit: 3,
+          GradePoints: 9,
+          InternalScore_out_of_50: 48,
+          LetterGrade: 'A+',
+          PredictedFinal_out_of_100: 72.6,
+          Total_out_of_100: 84.3,
+        },
+        {
+          CourseCode: 'CIE731',
+          CourseName: 'Information Retrieval',
+          Credit: 3,
+          GradePoints: 6,
+          InternalScore_out_of_50: 31,
+          LetterGrade: 'B',
+          PredictedFinal_out_of_100: 52.7,
+          Total_out_of_100: 57.3,
+        },
+        {
+          CourseCode: 'ETOE02',
+          CourseName: 'Wireless Sensor Networks',
+          Credit: 3,
+          GradePoints: 8,
+          InternalScore_out_of_50: 40,
+          LetterGrade: 'A',
+          PredictedFinal_out_of_100: 66.5,
+          Total_out_of_100: 73.2,
+        },
+      ],
+      predicted_sgpa: 7.94,
+    },
+    maxeffort: {
+      course_details: [
+        {
+          CourseCode: 'CI71',
+          CourseName: 'Multicore Architecture and programming',
+          Credit: 4,
+          GradePoints: 10,
+          InternalScore_out_of_50: 48,
+          LetterGrade: 'O',
+          PredictedFinal_out_of_100: 98.3,
+          Total_out_of_100: 97.1,
+        },
+        {
+          CourseCode: 'CI72',
+          CourseName: 'Foundations of Computer Vision',
+          Credit: 3,
+          GradePoints: 8,
+          InternalScore_out_of_50: 37,
+          LetterGrade: 'A',
+          PredictedFinal_out_of_100: 84.7,
+          Total_out_of_100: 79.4,
+        },
+        {
+          CourseCode: 'CIL74',
+          CourseName: 'Containerization Laboratory',
+          Credit: 1,
+          GradePoints: 10,
+          InternalScore_out_of_50: 50,
+          LetterGrade: 'O',
+          PredictedFinal_out_of_100: 99.4,
+          Total_out_of_100: 99.7,
+        },
+        {
+          CourseCode: 'CIL75',
+          CourseName: 'Skill Enhancement Lab -Generative AI',
+          Credit: 3,
+          GradePoints: 10,
+          InternalScore_out_of_50: 48,
+          LetterGrade: 'O',
+          PredictedFinal_out_of_100: 98.3,
+          Total_out_of_100: 97.1,
+        },
+        {
+          CourseCode: 'CIE731',
+          CourseName: 'Information Retrieval',
+          Credit: 3,
+          GradePoints: 7,
+          InternalScore_out_of_50: 31,
+          LetterGrade: 'B+',
+          PredictedFinal_out_of_100: 71.3,
+          Total_out_of_100: 66.7,
+        },
+        {
+          CourseCode: 'ETOE02',
+          CourseName: 'Wireless Sensor Networks',
+          Credit: 3,
+          GradePoints: 9,
+          InternalScore_out_of_50: 40,
+          LetterGrade: 'A+',
+          PredictedFinal_out_of_100: 89.9,
+          Total_out_of_100: 85,
+        },
+      ],
+      predicted_sgpa: 8.94,
+    },
+    mostlikely: {
+      course_details: [
+        {
+          CourseCode: 'CI71',
+          CourseName: 'Multicore Architecture and programming',
+          Credit: 4,
+          GradePoints: 10,
+          InternalScore_out_of_50: 48,
+          LetterGrade: 'O',
+          PredictedFinal_out_of_100: 85.5,
+          Total_out_of_100: 90.7,
+        },
+        {
+          CourseCode: 'CI72',
+          CourseName: 'Foundations of Computer Vision',
+          Credit: 3,
+          GradePoints: 8,
+          InternalScore_out_of_50: 37,
+          LetterGrade: 'A',
+          PredictedFinal_out_of_100: 73.7,
+          Total_out_of_100: 73.8,
+        },
+        {
+          CourseCode: 'CIL74',
+          CourseName: 'Containerization Laboratory',
+          Credit: 1,
+          GradePoints: 10,
+          InternalScore_out_of_50: 50,
+          LetterGrade: 'O',
+          PredictedFinal_out_of_100: 86.5,
+          Total_out_of_100: 93.2,
+        },
+        {
+          CourseCode: 'CIL75',
+          CourseName: 'Skill Enhancement Lab -Generative AI',
+          Credit: 3,
+          GradePoints: 10,
+          InternalScore_out_of_50: 48,
+          LetterGrade: 'O',
+          PredictedFinal_out_of_100: 85.5,
+          Total_out_of_100: 90.7,
+        },
+        {
+          CourseCode: 'CIE731',
+          CourseName: 'Information Retrieval',
+          Credit: 3,
+          GradePoints: 7,
+          InternalScore_out_of_50: 31,
+          LetterGrade: 'B+',
+          PredictedFinal_out_of_100: 62,
+          Total_out_of_100: 62,
+        },
+        {
+          CourseCode: 'ETOE02',
+          CourseName: 'Wireless Sensor Networks',
+          Credit: 3,
+          GradePoints: 8,
+          InternalScore_out_of_50: 40,
+          LetterGrade: 'A',
+          PredictedFinal_out_of_100: 78.2,
+          Total_out_of_100: 79.1,
+        },
+      ],
+      predicted_sgpa: 8.76,
+    },
+  },
+  cgpa: '9.99',
+  lastUpdated: '11/02/2025',
+  name: 'TEST USER',
+  usn: '1MS21AB001',
+  fetched_sgpa: '8.81',
+  fetched_cgpa: '8.67',
+  semester: 'Semister 7',
+}
+
 const MobileCourseCard = ({ course }) => {
   const gradeThresholds = [
     { label: 'O', target: 90 },
@@ -406,13 +708,22 @@ function HomePage() {
     localStorage.removeItem('theme')
   }, [])
 
+  useEffect(() => {
+    localStorage.setItem('semesterToggle', JSON.stringify(enabled))
+  }, [enabled])
+
   // Load user data and login history from localStorage.
   useEffect(() => {
     const storedUsn = localStorage.getItem('usn')
     const storedDob = localStorage.getItem('dob')
     const storedStudentData = localStorage.getItem('studentData')
     const storedHistory = localStorage.getItem('loginHistory')
-    
+    const storedEnabled = localStorage.getItem('semesterToggle')
+
+    if (storedEnabled) {
+      setEnabled(JSON.parse(storedEnabled))
+    }
+
     if (storedHistory) {
       try {
         const history = JSON.parse(storedHistory)
@@ -563,7 +874,7 @@ function HomePage() {
         dob: currentDob,
         name: data.name,
         lastUsed: new Date().toISOString(),
-        semester: enabled ? 'even' : 'odd'
+        semester: enabled ? 'even' : 'odd',
       })
       setIsLoggedIn(true)
       setLoginCounter((prev) => prev + 1)
@@ -578,10 +889,12 @@ function HomePage() {
   }
 
   const addToLoginHistory = (newEntry) => {
-    setLoginHistory(prevHistory => {
+    setLoginHistory((prevHistory) => {
       const updatedHistory = [
         newEntry,
-        ...prevHistory.filter(entry => entry.usn !== newEntry.usn).slice(0, 4)
+        ...prevHistory
+          .filter((entry) => entry.usn !== newEntry.usn)
+          .slice(0, 4),
       ]
       localStorage.setItem('loginHistory', JSON.stringify(updatedHistory))
       return updatedHistory
@@ -589,14 +902,19 @@ function HomePage() {
   }
 
   const removeFromHistory = (usnToRemove) => {
-    setLoginHistory(prevHistory => {
-      const updatedHistory = prevHistory.filter(entry => entry.usn !== usnToRemove)
+    setLoginHistory((prevHistory) => {
+      const updatedHistory = prevHistory.filter(
+        (entry) => entry.usn !== usnToRemove
+      )
       localStorage.setItem('loginHistory', JSON.stringify(updatedHistory))
       return updatedHistory
     })
   }
 
   const handleQuickLogin = async (historyEntry) => {
+    if (historyEntry.semester) {
+      setEnabled(historyEntry.semester === 'even')
+    }
     await handleFetchData(historyEntry.usn, historyEntry.dob)
   }
 
@@ -721,11 +1039,19 @@ function HomePage() {
                   <h3 className="mb-4 text-center font-bold">Quick Login</h3>
                   <div className="grid gap-3">
                     {loginHistory.map((entry) => (
-                      <div key={entry.usn} className="flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                      <div
+                        key={entry.usn}
+                        className="flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+                      >
                         <div className="flex flex-col">
                           <span className="font-medium">{entry.name}</span>
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{entry.usn}</span>
-                          <span className="text-xs text-gray-500 dark:text-gray-500">Last login: {new Date(entry.lastUsed).toLocaleDateString()}</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {entry.usn}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-500">
+                            Last login:{' '}
+                            {new Date(entry.lastUsed).toLocaleDateString()}
+                          </span>
                         </div>
                         <div className="flex gap-2">
                           <button
@@ -770,8 +1096,8 @@ function HomePage() {
                   />
                 </label>
                 <div className="flex flex-row items-center justify-center gap-2 py-3 lg:p-5">
-                  <p className="text-xs font-semibold text-slate-900 dark:text-zinc-50">
-                    Odd Sem
+                  <p className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
+                    {enabled ? 'Even Sem' : 'Odd Sem'}
                   </p>
                   <Switch
                     checked={enabled}
@@ -786,9 +1112,6 @@ function HomePage() {
                       } inline-block h-4 w-4 transform rounded-full bg-gray-200 transition dark:bg-white`}
                     />
                   </Switch>
-                  <p className="text-xs font-semibold text-slate-900 dark:text-zinc-50">
-                    Even Sem
-                  </p>
                 </div>
                 <button
                   onClick={() => handleFetchData(usn, dob)}
@@ -818,7 +1141,7 @@ function HomePage() {
               <div className="max-w-3xl lg:mx-auto lg:w-full">
                 {studentData && (
                   <>
-                    <div className="rounded-md shadow-md dark:bg-gray-800 my-2">
+                    <div className="my-2 rounded-md shadow-md dark:bg-gray-800">
                       <div className="p-3">
                         <div className="flex items-center justify-between">
                           <div>
@@ -837,30 +1160,45 @@ function HomePage() {
                               <Switch
                                 checked={enabled}
                                 onChange={(newValue) => {
-                                  setEnabled(newValue);
-                                  const newEndpoint = newValue ? 'newparents' : 'parentsodd';
-                                  const apiurl = `https://reconnect-msrit.vercel.app/sis?endpoint=${newEndpoint}&usn=${usn}&dob=${dob}`;
-                                  setIsLoading(true);
+                                  setEnabled(newValue)
+                                  const newEndpoint = newValue
+                                    ? 'newparents'
+                                    : 'parentsodd'
+                                  const apiurl = `https://reconnect-msrit.vercel.app/sis?endpoint=${newEndpoint}&usn=${usn}&dob=${dob}`
+                                  setIsLoading(true)
                                   fetch(apiurl)
-                                    .then(response => response.json())
-                                    .then(data => {
-                                      setStudentData(data);
-                                      localStorage.setItem('studentData', JSON.stringify(data));
-                                      toast.success(`Switched to ${newValue ? 'Even' : 'Odd'} Semester`);
+                                    .then((response) => response.json())
+                                    .then((data) => {
+                                      setStudentData(data)
+                                      localStorage.setItem(
+                                        'studentData',
+                                        JSON.stringify(data)
+                                      )
+                                      toast.success(
+                                        `Switched to ${
+                                          newValue ? 'Even' : 'Odd'
+                                        } Semester`
+                                      )
                                     })
-                                    .catch(err => {
-                                      toast.error('Failed to fetch semester data');
-                                      console.error(err);
+                                    .catch((err) => {
+                                      toast.error(
+                                        'Failed to fetch semester data'
+                                      )
+                                      console.error(err)
                                     })
                                     .finally(() => {
-                                      setIsLoading(false);
-                                    });
+                                      setIsLoading(false)
+                                    })
                                 }}
-                                className={`${enabled ? 'bg-blue-600' : 'bg-gray-400'} relative inline-flex h-6 w-11 items-center rounded-full`}
+                                className={`${
+                                  enabled ? 'bg-blue-600' : 'bg-gray-400'
+                                } relative inline-flex h-6 w-11 items-center rounded-full`}
                               >
                                 <span className="sr-only">Toggle semester</span>
                                 <span
-                                  className={`${enabled ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition`}
+                                  className={`${
+                                    enabled ? 'translate-x-6' : 'translate-x-1'
+                                  } inline-block h-4 w-4 transform rounded-full bg-white transition`}
                                 />
                               </Switch>
                             </div>
@@ -881,7 +1219,7 @@ function HomePage() {
                     </div>
                     <p className="mb-4 rounded-lg border border-neutral-700 bg-black/30 px-6 py-3 text-white shadow-md backdrop-blur-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
                       <span className="font-medium text-gray-400">
-                        SGPA for {' '}
+                        SGPA for{' '}
                       </span>
                       <span className="font-semibold text-white">
                         {studentData.semester}
