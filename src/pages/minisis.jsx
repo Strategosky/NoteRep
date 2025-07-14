@@ -32,6 +32,180 @@ if (!firebase.apps.length) {
   firebase.app()
 }
 
+const dummy_student_data = {
+  academicHistory: {
+    cumulative: {
+      cgpa: '8.67',
+      creditsEarned: '143',
+      creditsToBeEarned: '17',
+    },
+    semesters: [
+      {
+        cgpa: null,
+        creditsEarned: '20',
+        creditsRegistered: '20',
+        semester: 'Feb / Mar 2022',
+        sgpa: '8.75',
+      },
+      {
+        cgpa: '8.77',
+        creditsEarned: '16',
+        creditsRegistered: '20',
+        semester: 'July 2022',
+        sgpa: '7.05',
+      },
+      {
+        cgpa: '8.59',
+        creditsEarned: '21',
+        creditsRegistered: '21',
+        semester: 'Jan 2023',
+        sgpa: '8.28',
+      },
+      {
+        cgpa: '8.72',
+        creditsEarned: '22',
+        creditsRegistered: '22',
+        semester: 'May/June 2023',
+        sgpa: '9.04',
+      },
+      {
+        cgpa: '8.68',
+        creditsEarned: '4',
+        creditsRegistered: '4',
+        semester: 'Supplementary Semester July / August 2023',
+        sgpa: '8',
+      },
+      {
+        cgpa: '8.69',
+        creditsEarned: '21',
+        creditsRegistered: '21',
+        semester: 'ODD - December 2023',
+        sgpa: '8.71',
+      },
+      {
+        cgpa: '8.80',
+        creditsEarned: '22',
+        creditsRegistered: '22',
+        semester: 'EVEN - May 2024',
+        sgpa: '9.31',
+      },
+      {
+        cgpa: '8.67',
+        creditsEarned: '17',
+        creditsRegistered: '17',
+        semester: 'ODD Feb 2025',
+        sgpa: '7.76',
+      },
+    ],
+  },
+  cgpa: '8.67',
+  courses: [
+    {
+      CourseCode: '21INT82',
+      CourseName: 'Research / Industrial Internship',
+      InternalScore: 98,
+      attendance: 0,
+      credit: 5,
+    },
+    {
+      CourseCode: '21CIP81',
+      CourseName: 'Project Work',
+      InternalScore: 45,
+      attendance: 100,
+      credit: 12,
+    },
+    {
+      CourseCode: '21YO83',
+      CourseName: 'Yoga',
+      InternalScore: 25,
+      attendance: 0,
+      credit: 0,
+    },
+  ],
+  fetched_cgpa: '8.81',
+  fetched_sgpa: '10.00',
+  lastUpdated: '14/07/2025',
+  name: 'SHRAVAN M R',
+  predictions: {
+    atleast: {
+      course_details: [
+        {
+          CourseCode: '21INT82',
+          CourseName: 'Research / Industrial Internship',
+          Credit: 5.0,
+          GradePoints: 10,
+          InternalScore_out_of_50: 98.0,
+          LetterGrade: 'O',
+          PredictedFinal_out_of_100: 68.1,
+          Total_out_of_100: 132.1,
+        },
+        {
+          CourseCode: '21CIP81',
+          CourseName: 'Project Work',
+          Credit: 12.0,
+          GradePoints: 9,
+          InternalScore_out_of_50: 45.0,
+          LetterGrade: 'A+',
+          PredictedFinal_out_of_100: 70.9,
+          Total_out_of_100: 80.4,
+        },
+        {
+          CourseCode: '21YO83',
+          CourseName: 'Yoga',
+          Credit: 0.0,
+          GradePoints: 4,
+          InternalScore_out_of_50: 25.0,
+          LetterGrade: 'P',
+          PredictedFinal_out_of_100: 42.5,
+          Total_out_of_100: 46.2,
+        },
+      ],
+      predicted_sgpa: 9.29,
+    },
+    maxeffort: {
+      course_details: [
+        {
+          CourseCode: '21INT82',
+          CourseName: 'Research / Industrial Internship',
+          Credit: 5.0,
+          GradePoints: 10,
+          InternalScore_out_of_50: 98.0,
+          LetterGrade: 'O',
+          PredictedFinal_out_of_100: 92.2,
+          Total_out_of_100: 144.1,
+        },
+        {
+          CourseCode: '21CIP81',
+          CourseName: 'Project Work',
+          Credit: 12.0,
+          GradePoints: 10,
+          InternalScore_out_of_50: 45.0,
+          LetterGrade: 'O',
+          PredictedFinal_out_of_100: 95.9,
+          Total_out_of_100: 93.0,
+        },
+        {
+          CourseCode: '21YO83',
+          CourseName: 'Yoga',
+          Credit: 0.0,
+          GradePoints: 5,
+          InternalScore_out_of_50: 25.0,
+          LetterGrade: 'C',
+          PredictedFinal_out_of_100: 57.5,
+          Total_out_of_100: 53.8,
+        },
+      ],
+      predicted_sgpa: 10.0,
+    },
+    mostlikely: {
+      course_details: [],
+      predicted_sgpa: 10.0,
+    },
+  },
+  semester: 'Semester 8',
+  usn: '1MS21CI049',
+}
+
 const db = getFirestore()
 
 const MobileCourseCard = ({ course }) => {
@@ -888,20 +1062,21 @@ function HomePage() {
                           <span className="font-semibold">Last Updated: </span>
                           {studentData.lastUpdated || 'N/A'}
                         </p>
+                        {studentData.fetched_sgpa && (
+                          <div className="mt-3 flex items-center gap-2">
+                            <p className="mb-1">
+                              <span className="font-semibold">
+                                SGPA for {studentData.semester}:
+                              </span>
+                            </p>
+                            <span className="rounded-md bg-neutral-800 px-2 py-1 text-sm font-bold text-emerald-400 shadow-sm">
+                              {studentData.fetched_sgpa}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <AcademicHistory studentData={studentData} />
-                    <p className="mb-4 rounded-lg border border-neutral-700 bg-black/30 px-6 py-3 text-white shadow-md backdrop-blur-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                      <span className="font-medium text-gray-400">
-                        SGPA for{' '}
-                      </span>
-                      <span className="font-semibold text-white">
-                        {studentData.semester}
-                      </span>
-                      <span className="ml-2 rounded-md bg-neutral-800 px-2 py-1 text-xl font-bold text-emerald-400 shadow-sm">
-                        {studentData.fetched_sgpa}
-                      </span>
-                    </p>
 
                     {/* <div className="overflow-x-auto">
                         <table className="min-w-full rounded-md text-sm dark:bg-gray-700">
