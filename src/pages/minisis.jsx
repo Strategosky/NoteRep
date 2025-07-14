@@ -464,9 +464,26 @@ const SGPAPrediction = ({ studentData, onReload }) => {
     )
   }
 
-  // function to add the sgpa to cgpa
-  function addSGPAtoCGPA(sgpa, cgpa) {
-    return (sgpa + 6 * cgpa) / 7
+  // Calculate updated CGPA based on academic history
+  function calculateUpdatedCGPA(studentData, newSGPA) {
+    // Extract current semester number from "Semester X" format
+    const currentSemester = parseInt(studentData.semester.split(' ')[1])
+    console.log('Current semester:', currentSemester)
+    if (currentSemester <= 1) {
+      console.log('First semester, returning SGPA as CGPA:', newSGPA)
+      return parseFloat(newSGPA)
+    }
+    const currentCGPA = parseFloat(studentData.academicHistory.cumulative.cgpa)
+    const newCGPA =
+      (currentCGPA * (currentSemester - 1) + parseFloat(newSGPA)) /
+      currentSemester
+
+    return Number(newCGPA.toFixed(2))
+  }
+
+  // Helper function to calculate predicted CGPA
+  function addSGPAtoCGPA(sgpa) {
+    return calculateUpdatedCGPA(studentData, sgpa)
   }
 
   const predictions = [
@@ -535,8 +552,7 @@ const SGPAPrediction = ({ studentData, onReload }) => {
                   {prediction.value}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-200">
-                  CGPA:{' '}
-                  {addSGPAtoCGPA(prediction.value, studentData.cgpa).toFixed(2)}
+                  CGPA: {addSGPAtoCGPA(prediction.value).toFixed(2)}
                 </p>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   {prediction.description}
@@ -724,7 +740,6 @@ function HomePage() {
       setIsLoading(true)
       const testurl = `http://127.0.0.1:5000/sis?endpoint=newparents&usn=${currentUsn}&dob=${currentDob}`
       let apiurl = `https://reconnect-msrit.vercel.app/sis?endpoint=${semurl}&usn=${currentUsn}&dob=${currentDob}`
-      console.log('API URL:', apiurl)
       if (currentUsn === '1MS21AB001' && currentDob === '2003-01-01') {
         toast.info('Logging in with test data...')
         apiurl = 'https://reconnect-msrit.vercel.app/test'
@@ -1056,20 +1071,18 @@ function HomePage() {
                         </div>
                         <p className="mb-2">
                           <span className="font-semibold">Latest CGPA: </span>
-                          {studentData.fetched_cgpa}
+                          {studentData.cgpa}
                         </p>
                         <p className="mb-1">
                           <span className="font-semibold">Last Updated: </span>
                           {studentData.lastUpdated || 'N/A'}
                         </p>
                         {studentData.fetched_sgpa && (
-                          <div className="mt-3 flex items-center gap-2">
-                            <p className="mb-1">
-                              <span className="font-semibold">
-                                SGPA for {studentData.semester}:
-                              </span>
+                          <div className="mt-3 flex items-center gap-3">
+                            <p className="mb-0 font-semibold">
+                              SGPA for {studentData.semester}:
                             </p>
-                            <span className="rounded-md bg-neutral-800 px-2 py-1 text-sm font-bold text-emerald-400 shadow-sm">
+                            <span className="text-md font-bold text-emerald-400">
                               {studentData.fetched_sgpa}
                             </span>
                           </div>
