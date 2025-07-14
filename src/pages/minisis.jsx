@@ -23,6 +23,8 @@ import ComplimentAI from '@/components/ComplimentBot'
 import { getOrCreateUserId } from '@/utils/user'
 import { BadgeCheck, Target, TrendingUp } from 'lucide-react'
 import { Switch } from '@headlessui/react'
+import AcademicHistory from '@/components/AcademicHistory'
+import LoginHistory from '@/components/LoginHistory'
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
@@ -31,308 +33,6 @@ if (!firebase.apps.length) {
 }
 
 const db = getFirestore()
-
-const student_data = {
-  courses: [
-    {
-      CourseCode: 'CI71',
-      CourseName: 'Multicore Architecture and programming',
-      InternalScore: 48,
-      attendance: 88,
-      credit: 4,
-    },
-    {
-      CourseCode: 'CI72',
-      CourseName: 'Foundations of Computer Vision',
-      InternalScore: 47,
-      attendance: 86,
-      credit: 3,
-    },
-    {
-      CourseCode: 'CIL74',
-      CourseName: 'Containerization Laboratory',
-      InternalScore: 46,
-      attendance: 90,
-      credit: 1,
-    },
-    {
-      CourseCode: 'CIL75',
-      CourseName: 'Skill Enhancement Lab -Generative AI',
-      InternalScore: 45,
-      attendance: 86,
-      credit: 3,
-    },
-    {
-      CourseCode: 'CIE731',
-      CourseName: 'Information Retrieval',
-      InternalScore: 44,
-      attendance: 76,
-      credit: 3,
-    },
-    {
-      CourseCode: 'ETOE02',
-      CourseName: 'Wireless Sensor Networks',
-      InternalScore: 43,
-      attendance: 78,
-      credit: 3,
-    },
-  ],
-  academicHistory: {
-    cumulative: {
-      cgpa: '9.99',
-      creditsEarned: '126',
-      creditsToBeEarned: '34',
-    },
-    semesters: [
-      {
-        cgpa: 0,
-        creditsEarned: '20',
-        creditsRegistered: '20',
-        semester: 'Feb / Mar 2022',
-        sgpa: '8.75',
-      },
-      {
-        cgpa: '8.77',
-        creditsEarned: '16',
-        creditsRegistered: '20',
-        semester: 'July 2022',
-        sgpa: '7.05',
-      },
-      {
-        cgpa: '8.59',
-        creditsEarned: '21',
-        creditsRegistered: '21',
-        semester: 'Jan 2023',
-        sgpa: '8.28',
-      },
-      {
-        cgpa: '8.72',
-        creditsEarned: '22',
-        creditsRegistered: '22',
-        semester: 'May/June 2023',
-        sgpa: '9.04',
-      },
-      {
-        cgpa: '8.69',
-        creditsEarned: '21',
-        creditsRegistered: '21',
-        semester: 'ODD - December 2023',
-        sgpa: '8.71',
-      },
-      {
-        cgpa: '8.80',
-        creditsEarned: '22',
-        creditsRegistered: '22',
-        semester: 'EVEN - May 2024',
-        sgpa: '9.31',
-      },
-    ],
-  },
-  predictions: {
-    atleast: {
-      course_details: [
-        {
-          CourseCode: 'CI71',
-          CourseName: 'Multicore Architecture and programming',
-          Credit: 4,
-          GradePoints: 9,
-          InternalScore_out_of_50: 48,
-          LetterGrade: 'A+',
-          PredictedFinal_out_of_100: 72.6,
-          Total_out_of_100: 84.3,
-        },
-        {
-          CourseCode: 'CI72',
-          CourseName: 'Foundations of Computer Vision',
-          Credit: 3,
-          GradePoints: 7,
-          InternalScore_out_of_50: 37,
-          LetterGrade: 'B+',
-          PredictedFinal_out_of_100: 62.6,
-          Total_out_of_100: 68.3,
-        },
-        {
-          CourseCode: 'CIL74',
-          CourseName: 'Containerization Laboratory',
-          Credit: 1,
-          GradePoints: 9,
-          InternalScore_out_of_50: 50,
-          LetterGrade: 'A+',
-          PredictedFinal_out_of_100: 73.5,
-          Total_out_of_100: 86.7,
-        },
-        {
-          CourseCode: 'CIL75',
-          CourseName: 'Skill Enhancement Lab -Generative AI',
-          Credit: 3,
-          GradePoints: 9,
-          InternalScore_out_of_50: 48,
-          LetterGrade: 'A+',
-          PredictedFinal_out_of_100: 72.6,
-          Total_out_of_100: 84.3,
-        },
-        {
-          CourseCode: 'CIE731',
-          CourseName: 'Information Retrieval',
-          Credit: 3,
-          GradePoints: 6,
-          InternalScore_out_of_50: 31,
-          LetterGrade: 'B',
-          PredictedFinal_out_of_100: 52.7,
-          Total_out_of_100: 57.3,
-        },
-        {
-          CourseCode: 'ETOE02',
-          CourseName: 'Wireless Sensor Networks',
-          Credit: 3,
-          GradePoints: 8,
-          InternalScore_out_of_50: 40,
-          LetterGrade: 'A',
-          PredictedFinal_out_of_100: 66.5,
-          Total_out_of_100: 73.2,
-        },
-      ],
-      predicted_sgpa: 7.94,
-    },
-    maxeffort: {
-      course_details: [
-        {
-          CourseCode: 'CI71',
-          CourseName: 'Multicore Architecture and programming',
-          Credit: 4,
-          GradePoints: 10,
-          InternalScore_out_of_50: 48,
-          LetterGrade: 'O',
-          PredictedFinal_out_of_100: 98.3,
-          Total_out_of_100: 97.1,
-        },
-        {
-          CourseCode: 'CI72',
-          CourseName: 'Foundations of Computer Vision',
-          Credit: 3,
-          GradePoints: 8,
-          InternalScore_out_of_50: 37,
-          LetterGrade: 'A',
-          PredictedFinal_out_of_100: 84.7,
-          Total_out_of_100: 79.4,
-        },
-        {
-          CourseCode: 'CIL74',
-          CourseName: 'Containerization Laboratory',
-          Credit: 1,
-          GradePoints: 10,
-          InternalScore_out_of_50: 50,
-          LetterGrade: 'O',
-          PredictedFinal_out_of_100: 99.4,
-          Total_out_of_100: 99.7,
-        },
-        {
-          CourseCode: 'CIL75',
-          CourseName: 'Skill Enhancement Lab -Generative AI',
-          Credit: 3,
-          GradePoints: 10,
-          InternalScore_out_of_50: 48,
-          LetterGrade: 'O',
-          PredictedFinal_out_of_100: 98.3,
-          Total_out_of_100: 97.1,
-        },
-        {
-          CourseCode: 'CIE731',
-          CourseName: 'Information Retrieval',
-          Credit: 3,
-          GradePoints: 7,
-          InternalScore_out_of_50: 31,
-          LetterGrade: 'B+',
-          PredictedFinal_out_of_100: 71.3,
-          Total_out_of_100: 66.7,
-        },
-        {
-          CourseCode: 'ETOE02',
-          CourseName: 'Wireless Sensor Networks',
-          Credit: 3,
-          GradePoints: 9,
-          InternalScore_out_of_50: 40,
-          LetterGrade: 'A+',
-          PredictedFinal_out_of_100: 89.9,
-          Total_out_of_100: 85,
-        },
-      ],
-      predicted_sgpa: 8.94,
-    },
-    mostlikely: {
-      course_details: [
-        {
-          CourseCode: 'CI71',
-          CourseName: 'Multicore Architecture and programming',
-          Credit: 4,
-          GradePoints: 10,
-          InternalScore_out_of_50: 48,
-          LetterGrade: 'O',
-          PredictedFinal_out_of_100: 85.5,
-          Total_out_of_100: 90.7,
-        },
-        {
-          CourseCode: 'CI72',
-          CourseName: 'Foundations of Computer Vision',
-          Credit: 3,
-          GradePoints: 8,
-          InternalScore_out_of_50: 37,
-          LetterGrade: 'A',
-          PredictedFinal_out_of_100: 73.7,
-          Total_out_of_100: 73.8,
-        },
-        {
-          CourseCode: 'CIL74',
-          CourseName: 'Containerization Laboratory',
-          Credit: 1,
-          GradePoints: 10,
-          InternalScore_out_of_50: 50,
-          LetterGrade: 'O',
-          PredictedFinal_out_of_100: 86.5,
-          Total_out_of_100: 93.2,
-        },
-        {
-          CourseCode: 'CIL75',
-          CourseName: 'Skill Enhancement Lab -Generative AI',
-          Credit: 3,
-          GradePoints: 10,
-          InternalScore_out_of_50: 48,
-          LetterGrade: 'O',
-          PredictedFinal_out_of_100: 85.5,
-          Total_out_of_100: 90.7,
-        },
-        {
-          CourseCode: 'CIE731',
-          CourseName: 'Information Retrieval',
-          Credit: 3,
-          GradePoints: 7,
-          InternalScore_out_of_50: 31,
-          LetterGrade: 'B+',
-          PredictedFinal_out_of_100: 62,
-          Total_out_of_100: 62,
-        },
-        {
-          CourseCode: 'ETOE02',
-          CourseName: 'Wireless Sensor Networks',
-          Credit: 3,
-          GradePoints: 8,
-          InternalScore_out_of_50: 40,
-          LetterGrade: 'A',
-          PredictedFinal_out_of_100: 78.2,
-          Total_out_of_100: 79.1,
-        },
-      ],
-      predicted_sgpa: 8.76,
-    },
-  },
-  cgpa: '9.99',
-  lastUpdated: '11/02/2025',
-  name: 'TEST USER',
-  usn: '1MS21AB001',
-  fetched_sgpa: '8.81',
-  fetched_cgpa: '8.67',
-  semester: 'Semister 7',
-}
 
 const MobileCourseCard = ({ course }) => {
   const gradeThresholds = [
@@ -685,7 +385,7 @@ function HomePage() {
   const [usn, setUsn] = useState('')
   const [dob, setDob] = useState('')
   const [enabled, setEnabled] = useState(false)
-  const [loginHistory, setLoginHistory] = useState([])
+  const [localLoginHistory, setLocalLoginHistory] = useState([])
   const semurl = useMemo(
     () => (enabled ? 'newparents' : 'parentsodd'),
     [enabled]
@@ -720,14 +420,14 @@ function HomePage() {
     const storedHistory = localStorage.getItem('loginHistory')
     const storedEnabled = localStorage.getItem('semesterToggle')
 
-    if (storedEnabled) {
+    if (storedEnabled !== null) {
       setEnabled(JSON.parse(storedEnabled))
     }
 
     if (storedHistory) {
       try {
         const history = JSON.parse(storedHistory)
-        setLoginHistory(history)
+        setLocalLoginHistory(history)
       } catch (e) {
         console.error('Error parsing login history', e)
       }
@@ -889,7 +589,7 @@ function HomePage() {
   }
 
   const addToLoginHistory = (newEntry) => {
-    setLoginHistory((prevHistory) => {
+    setLocalLoginHistory((prevHistory) => {
       const updatedHistory = [
         newEntry,
         ...prevHistory
@@ -902,7 +602,7 @@ function HomePage() {
   }
 
   const removeFromHistory = (usnToRemove) => {
-    setLoginHistory((prevHistory) => {
+    setLocalLoginHistory((prevHistory) => {
       const updatedHistory = prevHistory.filter(
         (entry) => entry.usn !== usnToRemove
       )
@@ -1034,45 +734,11 @@ function HomePage() {
           </div>
           {!isLoggedIn ? (
             <section className="relative rounded-md border bg-indigo-50 px-4 py-6 shadow-md dark:border-gray-500 dark:bg-gray-900 sm:mt-6 sm:pb-2 sm:pt-2">
-              {loginHistory.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="mb-4 text-center font-bold">Quick Login</h3>
-                  <div className="grid gap-3">
-                    {loginHistory.map((entry) => (
-                      <div
-                        key={entry.usn}
-                        className="flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-                      >
-                        <div className="flex flex-col">
-                          <span className="font-medium">{entry.name}</span>
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {entry.usn}
-                          </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-500">
-                            Last login:{' '}
-                            {new Date(entry.lastUsed).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleQuickLogin(entry)}
-                            className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
-                          >
-                            Login
-                          </button>
-                          <button
-                            onClick={() => removeFromHistory(entry.usn)}
-                            className="rounded bg-red-600 px-3 py-1 text-sm text-white hover:bg-red-700"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700"></div>
-                </div>
-              )}
+              <LoginHistory
+                loginHistory={localLoginHistory}
+                onQuickLogin={handleQuickLogin}
+                onRemoveHistory={removeFromHistory}
+              />
               <div className="flex w-full max-w-md flex-col gap-4">
                 <label className="flex flex-col">
                   <span className="mb-2 text-sm">USN</span>
@@ -1101,7 +767,10 @@ function HomePage() {
                   </p>
                   <Switch
                     checked={enabled}
-                    onChange={setEnabled}
+                    onChange={(value) => {
+                      setEnabled(value)
+                      localStorage.setItem('semesterToggle', value)
+                    }}
                     className={`${
                       enabled ? 'bg-blue-600' : 'bg-white dark:bg-gray-500'
                     } relative inline-flex h-6 w-11 items-center rounded-full`}
@@ -1161,6 +830,10 @@ function HomePage() {
                                 checked={enabled}
                                 onChange={(newValue) => {
                                   setEnabled(newValue)
+                                  localStorage.setItem(
+                                    'semesterToggle',
+                                    newValue
+                                  )
                                   const newEndpoint = newValue
                                     ? 'newparents'
                                     : 'parentsodd'
@@ -1217,6 +890,7 @@ function HomePage() {
                         </p>
                       </div>
                     </div>
+                    <AcademicHistory studentData={studentData} />
                     <p className="mb-4 rounded-lg border border-neutral-700 bg-black/30 px-6 py-3 text-white shadow-md backdrop-blur-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
                       <span className="font-medium text-gray-400">
                         SGPA for{' '}
