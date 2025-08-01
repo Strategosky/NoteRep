@@ -571,6 +571,7 @@ function HomePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [studentData, setStudentData] = useState(null)
+  const [hasError, setHasError] = useState(false)
   const [loginCounter, setLoginCounter] = useState(0)
   const [usn, setUsn] = useState('')
   const [dob, setDob] = useState('')
@@ -737,6 +738,7 @@ function HomePage() {
 
     try {
       setError('')
+      setHasError(false)
       setIsLoading(true)
       const testurl = `http://127.0.0.1:5000/sis?endpoint=newparents&usn=${currentUsn}&dob=${currentDob}`
       let apiurl = `https://reconnect-msrit.vercel.app/sis?endpoint=${semurl}&usn=${currentUsn}&dob=${currentDob}`
@@ -746,6 +748,13 @@ function HomePage() {
       }
       const response = await fetch(apiurl)
       if (!response.ok) {
+        if (response.status === 500) {
+          const error = new Error(
+            'Server error: This endpoint is currently inactive. Try switching the semester toggle to use a different endpoint.'
+          )
+          error.isEndpointError = true
+          throw error
+        }
         const resp = await response.json()
         throw new Error(resp.error || 'Failed to fetch data.')
       }
@@ -769,9 +778,22 @@ function HomePage() {
       setLoginCounter((prev) => prev + 1)
       toast.success(`Welcome, ${data.name}!`)
     } catch (err) {
-      setError(err.message || 'Unknown error occurred')
+      const errorMessage = err.message || 'Unknown error occurred'
+      setError(errorMessage)
       setIsLoggedIn(false)
-      toast.error(err.message || 'Unknown error occurred')
+      setHasError(true)
+      toast.error(errorMessage)
+
+      if (err.isEndpointError) {
+        // Show user guidance to try the alternative endpoint
+        toast.info(
+          'Try switching between Even/Odd semester using the toggle above',
+          {
+            autoClose: 8000,
+          }
+        )
+      }
+      setStudentData(null) // Clear any existing data to prevent crash
     } finally {
       setIsLoading(false)
     }
@@ -816,6 +838,7 @@ function HomePage() {
     setLoginCounter(0)
     setStudentData(null)
     setError('')
+    setHasError(false)
     setIsLoggedIn(false)
     toast.info('Logged out successfully')
   }
@@ -881,43 +904,91 @@ function HomePage() {
             </p>
             {/* if student data the show a button to scroll to generate ai roast */}
             <div className="flex items-center justify-center ">
-              {studentData && (
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={handleScrollToResponse}
-                    className="group relative mt-2 inline-block cursor-pointer rounded-full p-px text-xs font-semibold leading-6 text-white no-underline shadow-2xl  shadow-zinc-900 dark:bg-slate-800"
-                  >
-                    <span className="absolute inset-0 overflow-hidden rounded-full">
-                      <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                    </span>
-                    <div className="relative z-10 flex items-center space-x-2 rounded-full bg-slate-900 px-4 py-0.5 ring-1 ring-white/10 ">
-                      <span>Scroll to AI Roast</span>
-                      <svg
-                        fill="none"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        width="16"
-                        xmlns="http://www.w3.org/2000/svg"
+              {hasError ? (
+                <div className="my-2 rounded-md bg-red-50 p-4 dark:bg-red-900/20">
+                  <div className="flex flex-col items-center justify-center">
+                    <h3 className="mb-2 text-lg font-semibold text-red-800 dark:text-red-200">
+                      Unable to Load Data
+                    </h3>
+                    <p className="mb-4 text-center text-red-700 dark:text-red-300">
+                      {error}
+                    </p>
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold">
+                          Try switching semester:
+                        </p>
+                        <Switch
+                          checked={enabled}
+                          onChange={(value) => {
+                            setEnabled(value)
+                            localStorage.setItem('semesterToggle', value)
+                            handleFetchData(usn, dob)
+                          }}
+                          className={`${
+                            enabled
+                              ? 'bg-blue-600'
+                              : 'bg-white dark:bg-gray-500'
+                          } relative inline-flex h-6 w-11 items-center rounded-full`}
+                        >
+                          <span
+                            className={`${
+                              enabled ? 'translate-x-6' : 'translate-x-1'
+                            } inline-block h-4 w-4 transform rounded-full bg-gray-200 transition dark:bg-white`}
+                          />
+                        </Switch>
+                        <span className="text-sm">
+                          {enabled ? 'Even' : 'Odd'} Sem
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleFetchData(usn, dob)}
+                        className="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
                       >
-                        <path
-                          d="M10.75 8.75L14.25 12L10.75 15.25"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="1.5"
-                        />
-                      </svg>
+                        Try Again
+                      </button>
                     </div>
-                    <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
-                  </button>
-
-                  <button
-                    onClick={handleScrollToPrediction}
-                    className="inline-flex h-[1.8rem] animate-shimmer items-center justify-center rounded-full border border-slate-700 bg-[linear-gradient(110deg,#fefcea,45%,#f1f1f1,55%,#fefcea)] bg-[length:200%_100%] px-6 text-xs font-medium text-slate-900 shadow-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 dark:bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] dark:text-white"
-                  >
-                    Predicted SGPA
-                  </button>
+                  </div>
                 </div>
+              ) : (
+                studentData && (
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={handleScrollToResponse}
+                      className="group relative mt-2 inline-block cursor-pointer rounded-full p-px text-xs font-semibold leading-6 text-white no-underline shadow-2xl  shadow-zinc-900 dark:bg-slate-800"
+                    >
+                      <span className="absolute inset-0 overflow-hidden rounded-full">
+                        <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                      </span>
+                      <div className="relative z-10 flex items-center space-x-2 rounded-full bg-slate-900 px-4 py-0.5 ring-1 ring-white/10 ">
+                        <span>Scroll to AI Roast</span>
+                        <svg
+                          fill="none"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M10.75 8.75L14.25 12L10.75 15.25"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          />
+                        </svg>
+                      </div>
+                      <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
+                    </button>
+
+                    <button
+                      onClick={handleScrollToPrediction}
+                      className="inline-flex h-[1.8rem] animate-shimmer items-center justify-center rounded-full border border-slate-700 bg-[linear-gradient(110deg,#fefcea,45%,#f1f1f1,55%,#fefcea)] bg-[length:200%_100%] px-6 text-xs font-medium text-slate-900 shadow-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 dark:bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] dark:text-white"
+                    >
+                      Predicted SGPA
+                    </button>
+                  </div>
+                )
               )}
             </div>
           </div>
