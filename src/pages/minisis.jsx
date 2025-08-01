@@ -25,6 +25,7 @@ import { BadgeCheck, Target, TrendingUp } from 'lucide-react'
 import { Switch } from '@headlessui/react'
 import AcademicHistory from '@/components/AcademicHistory'
 import LoginHistory from '@/components/LoginHistory'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig)
@@ -747,18 +748,29 @@ function HomePage() {
         apiurl = 'https://reconnect-msrit.vercel.app/test'
       }
       const response = await fetch(apiurl)
-      if (!response.ok) {
-        if (response.status === 500) {
-          const error = new Error(
-            'Server error: This endpoint is currently inactive. Try switching the semester toggle to use a different endpoint.'
-          )
-          error.isEndpointError = true
-          throw error
+      let data;
+      try {
+        if (!response.ok) {
+          if (response.status === 500) {
+            const error = new Error(
+              'Server error: This endpoint is currently inactive. Try switching the semester toggle to use a different endpoint.'
+            )
+            error.isEndpointError = true
+            // Throw error to be caught by error boundary
+            throw error
+          }
+          const resp = await response.json()
+          throw new Error(resp.error || 'Failed to fetch data.')
         }
-        const resp = await response.json()
-        throw new Error(resp.error || 'Failed to fetch data.')
+        data = await response.json()
+      } catch (error) {
+        // Set error state and clear data
+        setStudentData(null)
+        setError(error.message || 'An unexpected error occurred')
+        setHasError(true)
+        // Re-throw the error to be caught by error boundary
+        throw error
       }
-      const data = await response.json()
       localStorage.setItem('usn', currentUsn)
       localStorage.setItem('dob', currentDob)
       localStorage.setItem('studentData', JSON.stringify(data))
@@ -1068,6 +1080,15 @@ function HomePage() {
           ) : (
             <section className="flex w-full items-center justify-center bg-indigo-50 pb-8 dark:bg-gray-900 sm:py-2">
               <div className="max-w-3xl lg:mx-auto lg:w-full">
+                <ErrorBoundary 
+                  enabled={enabled}
+                  onToggle={(value) => {
+                    setEnabled(value)
+                    localStorage.setItem('semesterToggle', value)
+                    handleFetchData(usn, dob)
+                  }}
+                  onRetry={() => handleFetchData(usn, dob)}
+                >
                 {studentData && (
                   <>
                     <div className="my-2 rounded-md shadow-md dark:bg-gray-800">
@@ -1255,6 +1276,7 @@ function HomePage() {
                     )}
                   </>
                 )}
+                </ErrorBoundary>
                 <div className="mt-4 flex justify-center gap-4">
                   <button
                     onClick={handleReload}
