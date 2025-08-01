@@ -1024,7 +1024,7 @@ function HomePage() {
                                     newValue
                                   )
                                   const newEndpoint = newValue
-                                    ? 'newparents'
+                                    ? 'newparentseven'
                                     : 'parentsodd'
                                   const apiurl = `https://reconnect-msrit.vercel.app/sis?endpoint=${newEndpoint}&usn=${usn}&dob=${dob}`
                                   setIsLoading(true)
