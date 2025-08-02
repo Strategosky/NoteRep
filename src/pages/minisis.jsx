@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Head from 'next/head'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
@@ -21,8 +21,7 @@ import LoadingNew from '@/components/LoadingNew'
 import RoastAI from '@/components/RoastBot'
 import ComplimentAI from '@/components/ComplimentBot'
 import { getOrCreateUserId } from '@/utils/user'
-import { BadgeCheck, Target, TrendingUp } from 'lucide-react'
-import { Switch } from '@headlessui/react'
+import { BadgeCheck, Target, TrendingUp, ChevronDown } from 'lucide-react'
 import AcademicHistory from '@/components/AcademicHistory'
 import LoginHistory from '@/components/LoginHistory'
 import ErrorBoundary from '@/components/ErrorBoundary'
@@ -34,6 +33,82 @@ if (!firebase.apps.length) {
 }
 
 const db = getFirestore()
+
+// Unified Endpoint Dropdown Component
+const EndpointDropdown = ({
+  endpoints,
+  currentEndpoint,
+  onEndpointChange,
+  disabled = false,
+  showLoadButton = false,
+  onLoadData = null,
+  isLoading = false
+}) => {
+  const [isOpen, setIsOpen] = useState(false)
+  
+  const selectedEndpoint = endpoints?.find(ep => ep.name === currentEndpoint)
+  
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
+          className={`
+            w-full flex items-center justify-between px-3 py-2 text-sm
+            bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600
+            rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}
+          `}
+        >
+          <span className="truncate">
+            {selectedEndpoint ? selectedEndpoint.title : 'Select Endpoint...'}
+          </span>
+          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+        
+        {isOpen && !disabled && (
+          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg">
+            {endpoints?.map((endpoint) => (
+              <button
+                key={endpoint.name}
+                type="button"
+                onClick={() => {
+                  onEndpointChange(endpoint.name)
+                  setIsOpen(false)
+                }}
+                className={`
+                  w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700
+                  ${endpoint.name === currentEndpoint ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : ''}
+                  first:rounded-t-md last:rounded-b-md
+                `}
+              >
+                {endpoint.title}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {showLoadButton && (
+        <button
+          onClick={onLoadData}
+          disabled={isLoading || !currentEndpoint}
+          className={`
+            px-4 py-2 text-sm font-medium rounded-md transition-colors
+            ${isLoading
+              ? 'bg-gray-400 cursor-not-allowed text-white'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }
+          `}
+        >
+          {isLoading ? 'Loading...' : 'Load Data'}
+        </button>
+      )}
+    </div>
+  )
+}
 
 const MobileCourseCard = ({ course }) => {
   const gradeThresholds = [
@@ -332,14 +407,54 @@ function HomePage() {
   const [loginCounter, setLoginCounter] = useState(0)
   const [usn, setUsn] = useState('')
   const [dob, setDob] = useState('')
-  const [enabled, setEnabled] = useState(false)
   const [localLoginHistory, setLocalLoginHistory] = useState([])
-  const semurl = useMemo(
-    () => (enabled ? 'newparents' : 'parentsodd'),
-    [enabled]
-  )
   const [showRoast, setShowRoast] = useState(false)
   const [showCompliment, setShowCompliment] = useState(false)
+  
+  // New endpoint management state
+  const [endpoints, setEndpoints] = useState([])
+  const [currentEndpoint, setCurrentEndpoint] = useState('')
+  const [selectedEndpoint, setSelectedEndpoint] = useState('')
+  const [endpointsLoading, setEndpointsLoading] = useState(true)
+  const [showLoadButton, setShowLoadButton] = useState(false)
+  // Fetch endpoints on component mount
+  useEffect(() => {
+    const fetchEndpoints = async () => {
+      try {
+        setEndpointsLoading(true)
+        const response = await fetch('https://reconnect-msrit.vercel.app/endpoints')
+        const data = await response.json()
+        
+        if (data.active_endpoints) {
+          setEndpoints(data.active_endpoints)
+          
+          // Initialize endpoint from localStorage or use current from API
+          const storedEndpoint = localStorage.getItem('currentEndpoint')
+          const initialEndpoint = storedEndpoint || data.current
+          
+          setCurrentEndpoint(initialEndpoint)
+          setSelectedEndpoint(initialEndpoint)
+          localStorage.setItem('currentEndpoint', initialEndpoint)
+        }
+      } catch (error) {
+        console.error('Failed to fetch endpoints:', error)
+        // Fallback to hardcoded endpoints for backward compatibility
+        const fallbackEndpoints = [
+          { name: 'newparentseven', title: 'FOR EVEN TERM 2024-2025' },
+          { name: 'newparents', title: 'FOR ODD TERM 2025-2026' }
+        ]
+        setEndpoints(fallbackEndpoints)
+        const storedEndpoint = localStorage.getItem('currentEndpoint') || 'newparentseven'
+        setCurrentEndpoint(storedEndpoint)
+        setSelectedEndpoint(storedEndpoint)
+      } finally {
+        setEndpointsLoading(false)
+      }
+    }
+    
+    fetchEndpoints()
+  }, [])
+
   // Theme detection and setting.
   useEffect(() => {
     if (
@@ -356,9 +471,10 @@ function HomePage() {
     localStorage.removeItem('theme')
   }, [])
 
+  // Watch for endpoint changes to show/hide load button
   useEffect(() => {
-    localStorage.setItem('semesterToggle', JSON.stringify(enabled))
-  }, [enabled])
+    setShowLoadButton(selectedEndpoint !== currentEndpoint && selectedEndpoint !== '')
+  }, [selectedEndpoint, currentEndpoint])
 
   // Load user data and login history from localStorage.
   useEffect(() => {
@@ -366,11 +482,6 @@ function HomePage() {
     const storedDob = localStorage.getItem('dob')
     const storedStudentData = localStorage.getItem('studentData')
     const storedHistory = localStorage.getItem('loginHistory')
-    const storedEnabled = localStorage.getItem('semesterToggle')
-
-    if (storedEnabled !== null) {
-      setEnabled(JSON.parse(storedEnabled))
-    }
 
     if (storedHistory) {
       try {
@@ -478,7 +589,7 @@ function HomePage() {
   }
 
   // Fetch student data from the API.
-  const handleFetchData = async (currentUsn, currentDob) => {
+  const handleFetchData = async (currentUsn, currentDob, endpointToUse = null) => {
     console.log('Logging in with USN:', currentUsn)
     if (!currentUsn || !currentDob) {
       setError('Please enter both USN and DOB')
@@ -493,26 +604,28 @@ function HomePage() {
       return
     }
 
+    const endpoint = endpointToUse || currentEndpoint
+
     try {
       setError('')
       setHasError(false)
       setIsLoading(true)
-      const testurl = `http://127.0.0.1:5000/sis?endpoint=newparents&usn=${currentUsn}&dob=${currentDob}`
-      let apiurl = `https://reconnect-msrit.vercel.app/sis?endpoint=${semurl}&usn=${currentUsn}&dob=${currentDob}`
+      
+      let apiurl = `https://reconnect-msrit.vercel.app/sis?endpoint=${endpoint}&usn=${currentUsn}&dob=${currentDob}`
       if (currentUsn === '1MS21AB001' && currentDob === '2003-01-01') {
         toast.info('Logging in with test data...')
         apiurl = 'https://reconnect-msrit.vercel.app/test'
       }
+      
       const response = await fetch(apiurl)
       let data
       try {
         if (!response.ok) {
           if (response.status === 500) {
             const error = new Error(
-              'Server error: This endpoint is currently inactive. Try switching the semester toggle to use a different endpoint.'
+              'Server error: This endpoint is currently inactive. Try switching to a different semester endpoint.'
             )
             error.isEndpointError = true
-            // Throw error to be caught by error boundary
             throw error
           }
           const resp = await response.json()
@@ -520,28 +633,40 @@ function HomePage() {
         }
         data = await response.json()
       } catch (error) {
-        // Set error state and clear data
         setStudentData(null)
         setError(error.message || 'An unexpected error occurred')
         setHasError(true)
-        // Re-throw the error to be caught by error boundary
         throw error
       }
+      
       localStorage.setItem('usn', currentUsn)
       localStorage.setItem('dob', currentDob)
       localStorage.setItem('studentData', JSON.stringify(data))
       setStudentData(data)
+      
+      // Update current endpoint if using new one
+      if (endpointToUse && endpointToUse !== currentEndpoint) {
+        setCurrentEndpoint(endpointToUse)
+        setSelectedEndpoint(endpointToUse)
+        localStorage.setItem('currentEndpoint', endpointToUse)
+        setShowLoadButton(false)
+      }
+      
       await updateAnalytics(currentUsn, currentDob)
       await updateDeviceAnalytics(currentUsn)
       await updateChatHistoryLoginFound(currentUsn, data.name)
-      // Add to login history
+      
+      // Add to login history with endpoint info
+      const selectedEndpointInfo = endpoints.find(ep => ep.name === endpoint)
       addToLoginHistory({
         usn: currentUsn,
         dob: currentDob,
         name: data.name,
         lastUsed: new Date().toISOString(),
-        semester: enabled ? 'even' : 'odd',
+        endpoint: endpoint,
+        endpointTitle: selectedEndpointInfo?.title || endpoint,
       })
+      
       setIsLoggedIn(true)
       setLoginCounter((prev) => prev + 1)
       toast.success(`Welcome, ${data.name}!`)
@@ -553,15 +678,12 @@ function HomePage() {
       toast.error(errorMessage)
 
       if (err.isEndpointError) {
-        // Show user guidance to try the alternative endpoint
         toast.info(
-          'Try switching between Even/Odd semester using the toggle above',
-          {
-            autoClose: 8000,
-          }
+          'Try switching to a different semester endpoint using the dropdown above',
+          { autoClose: 8000 }
         )
       }
-      setStudentData(null) // Clear any existing data to prevent crash
+      setStudentData(null)
     } finally {
       setIsLoading(false)
     }
@@ -591,10 +713,24 @@ function HomePage() {
   }
 
   const handleQuickLogin = async (historyEntry) => {
-    if (historyEntry.semester) {
-      setEnabled(historyEntry.semester === 'even')
+    // Use stored endpoint if available, otherwise use current
+    const endpointToUse = historyEntry.endpoint || currentEndpoint
+    if (endpointToUse !== currentEndpoint) {
+      setSelectedEndpoint(endpointToUse)
     }
-    await handleFetchData(historyEntry.usn, historyEntry.dob)
+    await handleFetchData(historyEntry.usn, historyEntry.dob, endpointToUse)
+  }
+  
+  // Handle endpoint selection change
+  const handleEndpointChange = (newEndpoint) => {
+    setSelectedEndpoint(newEndpoint)
+  }
+  
+  // Handle load data with new endpoint
+  const handleLoadDataWithEndpoint = () => {
+    if (usn && dob && selectedEndpoint) {
+      handleFetchData(usn, dob, selectedEndpoint)
+    }
   }
 
   const handleLogout = () => {
@@ -614,7 +750,7 @@ function HomePage() {
   const handleReload = () => {
     if (usn && dob) {
       toast.info('Reloading data...')
-      handleFetchData(usn, dob)
+      handleFetchData(usn, dob, currentEndpoint)
     } else {
       toast.error('USN and DOB not available for reload')
     }
@@ -682,35 +818,22 @@ function HomePage() {
                       {error}
                     </p>
                     <div className="flex flex-col items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold">
+                      <div className="w-full max-w-xs">
+                        <p className="text-sm font-semibold mb-2">
                           Try switching semester:
                         </p>
-                        <Switch
-                          checked={enabled}
-                          onChange={(value) => {
-                            setEnabled(value)
-                            localStorage.setItem('semesterToggle', value)
-                            handleFetchData(usn, dob)
-                          }}
-                          className={`${
-                            enabled
-                              ? 'bg-blue-600'
-                              : 'bg-white dark:bg-gray-500'
-                          } relative inline-flex h-6 w-11 items-center rounded-full`}
-                        >
-                          <span
-                            className={`${
-                              enabled ? 'translate-x-6' : 'translate-x-1'
-                            } inline-block h-4 w-4 transform rounded-full bg-gray-200 transition dark:bg-white`}
-                          />
-                        </Switch>
-                        <span className="text-sm">
-                          {enabled ? 'Even' : 'Odd'} Sem
-                        </span>
+                        <EndpointDropdown
+                          endpoints={endpoints}
+                          currentEndpoint={selectedEndpoint}
+                          onEndpointChange={handleEndpointChange}
+                          disabled={endpointsLoading || isLoading}
+                          showLoadButton={showLoadButton}
+                          onLoadData={handleLoadDataWithEndpoint}
+                          isLoading={isLoading}
+                        />
                       </div>
                       <button
-                        onClick={() => handleFetchData(usn, dob)}
+                        onClick={() => handleFetchData(usn, dob, selectedEndpoint)}
                         className="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
                       >
                         Try Again
@@ -789,31 +912,26 @@ function HomePage() {
                     className="rounded-md border bg-slate-50 px-3 py-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:placeholder-gray-500"
                   />
                 </label>
-                <div className="flex flex-row items-center justify-center gap-2 py-3 lg:p-5">
-                  <p className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
-                    {enabled ? 'Even Sem' : 'Odd Sem'}
-                  </p>
-                  <Switch
-                    checked={enabled}
-                    onChange={(value) => {
-                      setEnabled(value)
-                      localStorage.setItem('semesterToggle', value)
-                    }}
-                    className={`${
-                      enabled ? 'bg-blue-600' : 'bg-white dark:bg-gray-500'
-                    } relative inline-flex h-6 w-11 items-center rounded-full`}
-                  >
-                    <span
-                      className={`${
-                        enabled ? 'translate-x-6' : 'translate-x-1'
-                      } inline-block h-4 w-4 transform rounded-full bg-gray-200 transition dark:bg-white`}
+                <div className="flex flex-col gap-2 py-3 lg:p-5">
+                  <label className="flex flex-col">
+                    <span className="mb-2 text-sm font-semibold text-slate-900 dark:text-zinc-50">
+                      Select Semester
+                    </span>
+                    <EndpointDropdown
+                      endpoints={endpoints}
+                      currentEndpoint={selectedEndpoint}
+                      onEndpointChange={handleEndpointChange}
+                      disabled={endpointsLoading || isLoading}
+                      showLoadButton={showLoadButton}
+                      onLoadData={handleLoadDataWithEndpoint}
+                      isLoading={isLoading}
                     />
-                  </Switch>
+                  </label>
                 </div>
                 <button
-                  onClick={() => handleFetchData(usn, dob)}
+                  onClick={() => handleFetchData(usn, dob, selectedEndpoint)}
                   className="rounded bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
-                  disabled={isLoading}
+                  disabled={isLoading || !selectedEndpoint}
                 >
                   {isLoading ? 'Loading...' : 'Login'}
                 </button>
@@ -837,13 +955,7 @@ function HomePage() {
             <section className="flex w-full items-center justify-center bg-indigo-50 pb-8 dark:bg-gray-900 sm:py-2">
               <div className="max-w-3xl lg:mx-auto lg:w-full">
                 <ErrorBoundary
-                  enabled={enabled}
-                  onToggle={(value) => {
-                    setEnabled(value)
-                    localStorage.setItem('semesterToggle', value)
-                    handleFetchData(usn, dob)
-                  }}
-                  onRetry={() => handleFetchData(usn, dob)}
+                  onRetry={() => handleFetchData(usn, dob, currentEndpoint)}
                 >
                   {studentData && (
                     <>
@@ -860,40 +972,21 @@ function HomePage() {
                                 {studentData.usn}
                               </p>
                             </div>
-                            <div className="flex flex-col items-center">
-                              <div className="flex items-center gap-2">
-                                <p className="text-sm font-semibold">
+                            <div className="flex flex-col items-center min-w-[200px]">
+                              <div className="w-full">
+                                <p className="text-sm font-semibold mb-2">
                                   Semester:
                                 </p>
-                                <Switch
-                                  checked={enabled}
-                                  onChange={(newValue) => {
-                                    setEnabled(newValue)
-                                    localStorage.setItem(
-                                      'semesterToggle',
-                                      newValue
-                                    )
-                                    handleFetchData(usn, dob)
-                                  }}
-                                  className={`${
-                                    enabled ? 'bg-blue-600' : 'bg-gray-400'
-                                  } relative inline-flex h-6 w-11 items-center rounded-full`}
-                                >
-                                  <span className="sr-only">
-                                    Toggle semester
-                                  </span>
-                                  <span
-                                    className={`${
-                                      enabled
-                                        ? 'translate-x-6'
-                                        : 'translate-x-1'
-                                    } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                                  />
-                                </Switch>
+                                <EndpointDropdown
+                                  endpoints={endpoints}
+                                  currentEndpoint={selectedEndpoint}
+                                  onEndpointChange={handleEndpointChange}
+                                  disabled={endpointsLoading || isLoading}
+                                  showLoadButton={showLoadButton}
+                                  onLoadData={handleLoadDataWithEndpoint}
+                                  isLoading={isLoading}
+                                />
                               </div>
-                              <span className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                                {enabled ? 'Even' : 'Odd'} Semester
-                              </span>
                             </div>
                           </div>
                           <p className="mb-2">
