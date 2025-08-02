@@ -54,3 +54,8 @@ jobs:
         run: |
           AUTHOR=$(git log -1 --pretty=format:'%an <%ae>')
           echo "author=$AUTHOR" >> "$GITHUB_OUTPUT"
+      
+      - name: Debug Author Output
+        run: |
+          echo "Captured Author: ${{ steps.commit_author.outputs.author }}"
+        
