@@ -94,7 +94,7 @@ const EndpointDropdown = ({
       {showLoadButton && (
         <button
           onClick={onLoadData}
-          disabled={isLoading || !currentEndpoint}
+          disabled={isLoading}
           className={`
             px-4 py-2 text-sm font-medium rounded-md transition-colors
             ${isLoading
@@ -728,8 +728,19 @@ function HomePage() {
   
   // Handle load data with new endpoint
   const handleLoadDataWithEndpoint = () => {
-    if (usn && dob && selectedEndpoint) {
+    console.log('Load Data clicked:', { usn, dob, selectedEndpoint, isLoggedIn })
+    
+    if (!selectedEndpoint) {
+      toast.error('Please select an endpoint first')
+      return
+    }
+    
+    if (isLoggedIn && usn && dob) {
+      // User is logged in, just switch endpoint
       handleFetchData(usn, dob, selectedEndpoint)
+    } else {
+      // User not logged in, show error
+      toast.error('Please login first before switching endpoints')
     }
   }
 
@@ -922,7 +933,7 @@ function HomePage() {
                       currentEndpoint={selectedEndpoint}
                       onEndpointChange={handleEndpointChange}
                       disabled={endpointsLoading || isLoading}
-                      showLoadButton={showLoadButton}
+                      showLoadButton={false}
                       onLoadData={handleLoadDataWithEndpoint}
                       isLoading={isLoading}
                     />
