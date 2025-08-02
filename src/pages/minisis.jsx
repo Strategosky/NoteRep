@@ -33,263 +33,9 @@ if (!firebase.apps.length) {
   firebase.app()
 }
 
-const dummy_student_data = {
-  academicHistory: {
-    cumulative: {
-      cgpa: '8.67',
-      creditsEarned: '143',
-      creditsToBeEarned: '17',
-    },
-    semesters: [
-      {
-        cgpa: null,
-        creditsEarned: '20',
-        creditsRegistered: '20',
-        semester: 'Feb / Mar 2022',
-        sgpa: '8.75',
-      },
-      {
-        cgpa: '8.77',
-        creditsEarned: '16',
-        creditsRegistered: '20',
-        semester: 'July 2022',
-        sgpa: '7.05',
-      },
-      {
-        cgpa: '8.59',
-        creditsEarned: '21',
-        creditsRegistered: '21',
-        semester: 'Jan 2023',
-        sgpa: '8.28',
-      },
-      {
-        cgpa: '8.72',
-        creditsEarned: '22',
-        creditsRegistered: '22',
-        semester: 'May/June 2023',
-        sgpa: '9.04',
-      },
-      {
-        cgpa: '8.68',
-        creditsEarned: '4',
-        creditsRegistered: '4',
-        semester: 'Supplementary Semester July / August 2023',
-        sgpa: '8',
-      },
-      {
-        cgpa: '8.69',
-        creditsEarned: '21',
-        creditsRegistered: '21',
-        semester: 'ODD - December 2023',
-        sgpa: '8.71',
-      },
-      {
-        cgpa: '8.80',
-        creditsEarned: '22',
-        creditsRegistered: '22',
-        semester: 'EVEN - May 2024',
-        sgpa: '9.31',
-      },
-      {
-        cgpa: '8.67',
-        creditsEarned: '17',
-        creditsRegistered: '17',
-        semester: 'ODD Feb 2025',
-        sgpa: '7.76',
-      },
-    ],
-  },
-  cgpa: '8.67',
-  courses: [
-    {
-      CourseCode: '21INT82',
-      CourseName: 'Research / Industrial Internship',
-      InternalScore: 98,
-      attendance: 0,
-      credit: 5,
-    },
-    {
-      CourseCode: '21CIP81',
-      CourseName: 'Project Work',
-      InternalScore: 45,
-      attendance: 100,
-      credit: 12,
-    },
-    {
-      CourseCode: '21YO83',
-      CourseName: 'Yoga',
-      InternalScore: 25,
-      attendance: 0,
-      credit: 0,
-    },
-  ],
-  fetched_cgpa: '8.81',
-  fetched_sgpa: '10.00',
-  lastUpdated: '14/07/2025',
-  name: 'SHRAVAN M R',
-  predictions: {
-    atleast: {
-      course_details: [
-        {
-          CourseCode: '21INT82',
-          CourseName: 'Research / Industrial Internship',
-          Credit: 5.0,
-          GradePoints: 10,
-          InternalScore_out_of_50: 98.0,
-          LetterGrade: 'O',
-          PredictedFinal_out_of_100: 68.1,
-          Total_out_of_100: 132.1,
-        },
-        {
-          CourseCode: '21CIP81',
-          CourseName: 'Project Work',
-          Credit: 12.0,
-          GradePoints: 9,
-          InternalScore_out_of_50: 45.0,
-          LetterGrade: 'A+',
-          PredictedFinal_out_of_100: 70.9,
-          Total_out_of_100: 80.4,
-        },
-        {
-          CourseCode: '21YO83',
-          CourseName: 'Yoga',
-          Credit: 0.0,
-          GradePoints: 4,
-          InternalScore_out_of_50: 25.0,
-          LetterGrade: 'P',
-          PredictedFinal_out_of_100: 42.5,
-          Total_out_of_100: 46.2,
-        },
-      ],
-      predicted_sgpa: 9.29,
-    },
-    maxeffort: {
-      course_details: [
-        {
-          CourseCode: '21INT82',
-          CourseName: 'Research / Industrial Internship',
-          Credit: 5.0,
-          GradePoints: 10,
-          InternalScore_out_of_50: 98.0,
-          LetterGrade: 'O',
-          PredictedFinal_out_of_100: 92.2,
-          Total_out_of_100: 144.1,
-        },
-        {
-          CourseCode: '21CIP81',
-          CourseName: 'Project Work',
-          Credit: 12.0,
-          GradePoints: 10,
-          InternalScore_out_of_50: 45.0,
-          LetterGrade: 'O',
-          PredictedFinal_out_of_100: 95.9,
-          Total_out_of_100: 93.0,
-        },
-        {
-          CourseCode: '21YO83',
-          CourseName: 'Yoga',
-          Credit: 0.0,
-          GradePoints: 5,
-          InternalScore_out_of_50: 25.0,
-          LetterGrade: 'C',
-          PredictedFinal_out_of_100: 57.5,
-          Total_out_of_100: 53.8,
-        },
-      ],
-      predicted_sgpa: 10.0,
-    },
-    mostlikely: {
-      course_details: [],
-      predicted_sgpa: 10.0,
-    },
-  },
-  semester: 'Semester 8',
-  usn: '1MS21CI049',
-}
-
 const db = getFirestore()
 
 const MobileCourseCard = ({ course }) => {
-  const gradeThresholds = [
-    { label: 'O', target: 90 },
-    { label: 'A+', target: 80 },
-    { label: 'A', target: 70 },
-    { label: 'B+', target: 60 },
-    { label: 'B', target: 55 },
-    { label: 'C', target: 50 },
-    { label: 'P', target: 40 },
-  ]
-
-  const calculateRequired = (targetPercentage) => {
-    const required = (targetPercentage - course.InternalScore) * 2
-    if (required <= 0) return 'P'
-    const finalRequired = Math.max(35, required)
-    return finalRequired > 100 ? 'NA' : finalRequired
-  }
-
-  const visibleThresholds = gradeThresholds
-    .filter((th) => {
-      const required = (th.target - course.InternalScore) * 2
-      return (
-        required > 35 ||
-        (required > 0 &&
-          required <= 35 &&
-          th ===
-            gradeThresholds.find(
-              (t) =>
-                (t.target - course.InternalScore) * 2 > 0 &&
-                (t.target - course.InternalScore) * 2 <= 35
-            ))
-      )
-    })
-    .filter((th) => calculateRequired(th.target) !== 'NA')
-    .slice(0, 6)
-
-  if (visibleThresholds.length === 0) {
-    const highestAchieved = gradeThresholds.find(
-      (th) => (th.target - course.InternalScore) * 2 <= 0
-    )
-    if (highestAchieved) {
-      visibleThresholds.push(highestAchieved)
-    }
-  }
-
-  return (
-    <div className="my-4 rounded-md border bg-white p-4 shadow dark:bg-gray-800">
-      <h3 className="mb-1 text-lg font-bold">{course.CourseName}</h3>
-      <p className="mb-3 text-sm md:text-base">
-        CIE Score: {course.InternalScore} / 50
-      </p>
-
-      <div
-        className={`flex flex-wrap gap-1.5 sm:gap-2 ${
-          visibleThresholds.length <= 3
-            ? 'grid-cols-3'
-            : 'grid-cols-3 sm:grid-cols-6'
-        }`}
-      >
-        {visibleThresholds.map((th) => {
-          const displayValue = calculateRequired(th.target)
-          return (
-            <div
-              key={th.label}
-              className={`flex min-w-[80px] flex-1 flex-col justify-center rounded border p-1.5 text-center sm:p-2 
-              ${displayValue === 35 ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
-              ${
-                displayValue === '-' ? 'bg-green-50 dark:bg-green-900/20' : ''
-              }`}
-            >
-              <div className="text-sm font-bold sm:text-base">{th.label}</div>
-              <div className="text-xs sm:text-sm">{displayValue}</div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-const NewMobileCourseCard = ({ course }) => {
   const gradeThresholds = [
     { label: 'O', min: 90, max: 100 },
     { label: 'A+', min: 80, max: 89 },
@@ -346,9 +92,11 @@ const GradesTable = ({ studentData }) => {
   if (!studentData?.courses?.length) {
     return (
       <div className="mt-8 hidden items-center md:block">
-        <div className="text-center text-gray-500">No course data available</div>
+        <div className="text-center text-gray-500">
+          No course data available
+        </div>
       </div>
-    );
+    )
   }
 
   const gradeThresholds = [
@@ -756,7 +504,7 @@ function HomePage() {
         apiurl = 'https://reconnect-msrit.vercel.app/test'
       }
       const response = await fetch(apiurl)
-      let data;
+      let data
       try {
         if (!response.ok) {
           if (response.status === 500) {
@@ -1088,7 +836,7 @@ function HomePage() {
           ) : (
             <section className="flex w-full items-center justify-center bg-indigo-50 pb-8 dark:bg-gray-900 sm:py-2">
               <div className="max-w-3xl lg:mx-auto lg:w-full">
-                <ErrorBoundary 
+                <ErrorBoundary
                   enabled={enabled}
                   onToggle={(value) => {
                     setEnabled(value)
@@ -1097,71 +845,82 @@ function HomePage() {
                   }}
                   onRetry={() => handleFetchData(usn, dob)}
                 >
-                {studentData && (
-                  <>
-                    <div className="my-2 rounded-md shadow-md dark:bg-gray-800">
-                      <div className="p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="mb-2">
-                              <span className="font-semibold">Name: </span>
-                              {studentData.name}
-                            </p>
-                            <p className="mb-2">
-                              <span className="font-semibold">USN: </span>
-                              {studentData.usn}
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-center">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-semibold">Semester:</p>
-                              <Switch
-                                checked={enabled}
-                                onChange={(newValue) => {
-                                  setEnabled(newValue)
-                                  localStorage.setItem('semesterToggle', newValue)
-                                  handleFetchData(usn, dob)
-                                }}
-                                className={`${
-                                  enabled ? 'bg-blue-600' : 'bg-gray-400'
-                                } relative inline-flex h-6 w-11 items-center rounded-full`}
-                              >
-                                <span className="sr-only">Toggle semester</span>
-                                <span
-                                  className={`${
-                                    enabled ? 'translate-x-6' : 'translate-x-1'
-                                  } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                                />
-                              </Switch>
+                  {studentData && (
+                    <>
+                      <div className="my-2 rounded-md shadow-md dark:bg-gray-800">
+                        <div className="p-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="mb-2">
+                                <span className="font-semibold">Name: </span>
+                                {studentData.name}
+                              </p>
+                              <p className="mb-2">
+                                <span className="font-semibold">USN: </span>
+                                {studentData.usn}
+                              </p>
                             </div>
-                            <span className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                              {enabled ? 'Even' : 'Odd'} Semester
-                            </span>
+                            <div className="flex flex-col items-center">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-semibold">
+                                  Semester:
+                                </p>
+                                <Switch
+                                  checked={enabled}
+                                  onChange={(newValue) => {
+                                    setEnabled(newValue)
+                                    localStorage.setItem(
+                                      'semesterToggle',
+                                      newValue
+                                    )
+                                    handleFetchData(usn, dob)
+                                  }}
+                                  className={`${
+                                    enabled ? 'bg-blue-600' : 'bg-gray-400'
+                                  } relative inline-flex h-6 w-11 items-center rounded-full`}
+                                >
+                                  <span className="sr-only">
+                                    Toggle semester
+                                  </span>
+                                  <span
+                                    className={`${
+                                      enabled
+                                        ? 'translate-x-6'
+                                        : 'translate-x-1'
+                                    } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+                                  />
+                                </Switch>
+                              </div>
+                              <span className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                                {enabled ? 'Even' : 'Odd'} Semester
+                              </span>
+                            </div>
                           </div>
+                          <p className="mb-2">
+                            <span className="font-semibold">Latest CGPA: </span>
+                            {studentData.cgpa}
+                          </p>
+                          <p className="mb-1">
+                            <span className="font-semibold">
+                              Last Updated:{' '}
+                            </span>
+                            {studentData.lastUpdated || 'N/A'}
+                          </p>
+                          {studentData.fetched_sgpa && (
+                            <div className="mt-3 flex items-center gap-3">
+                              <p className="mb-0 font-semibold">
+                                SGPA for {studentData.semester}:
+                              </p>
+                              <span className="text-md font-bold text-emerald-400">
+                                {studentData.fetched_sgpa}
+                              </span>
+                            </div>
+                          )}
                         </div>
-                        <p className="mb-2">
-                          <span className="font-semibold">Latest CGPA: </span>
-                          {studentData.cgpa}
-                        </p>
-                        <p className="mb-1">
-                          <span className="font-semibold">Last Updated: </span>
-                          {studentData.lastUpdated || 'N/A'}
-                        </p>
-                        {studentData.fetched_sgpa && (
-                          <div className="mt-3 flex items-center gap-3">
-                            <p className="mb-0 font-semibold">
-                              SGPA for {studentData.semester}:
-                            </p>
-                            <span className="text-md font-bold text-emerald-400">
-                              {studentData.fetched_sgpa}
-                            </span>
-                          </div>
-                        )}
                       </div>
-                    </div>
-                    <AcademicHistory studentData={studentData} />
+                      <AcademicHistory studentData={studentData} />
 
-                    {/* <div className="overflow-x-auto">
+                      {/* <div className="overflow-x-auto">
                         <table className="min-w-full rounded-md text-sm dark:bg-gray-700">
                           <thead className="border-b text-left">
                             <tr className="rounded-t-md">
@@ -1190,74 +949,81 @@ function HomePage() {
                           </tbody>
                         </table>
                       </div> */}
-                    {/* </div> */}
+                      {/* </div> */}
 
-                    <div className="mt-2">
-                      <div className="block md:hidden">
-                        <h2 className="text-center text-lg font-bold">
-                          Required SEE Marks (min) for Respective Grades
-                        </h2>
-                        {studentData?.courses?.length > 0 ? (
-                          studentData.courses.map((course, index) => (
-                          <NewMobileCourseCard key={index} course={course} />
-                          ))
-                        ) : (
-                          <div className="text-center text-gray-500">No course data available</div>
-                        )}
+                      <div className="mt-2">
+                        <div className="block md:hidden">
+                          <h2 className="text-center text-lg font-bold">
+                            Required SEE Marks (min) for Respective Grades
+                          </h2>
+                          {studentData?.courses?.length > 0 ? (
+                            studentData.courses.map((course, index) => (
+                              <MobileCourseCard key={index} course={course} />
+                            ))
+                          ) : (
+                            <div className="text-center text-gray-500">
+                              No course data available
+                            </div>
+                          )}
+                        </div>
+                        <GradesTable studentData={studentData} />
                       </div>
-                      <GradesTable studentData={studentData} />
-                    </div>
 
-                    <div className="my-4 flex justify-center gap-4">
-                      <button
-                        onClick={setShowRoast.bind(null, (prev) => !prev)}
-                        className="rounded bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
-                        disabled={isLoading}
-                      >
-                        {showRoast ? 'Hide Roast' : 'Show Roast'}
-                      </button>
-                    </div>
+                      <div className="my-4 flex justify-center gap-4">
+                        <button
+                          onClick={setShowRoast.bind(null, (prev) => !prev)}
+                          className="rounded bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+                          disabled={isLoading}
+                        >
+                          {showRoast ? 'Hide Roast' : 'Show Roast'}
+                        </button>
+                      </div>
 
-                    {showRoast && (
-                      <div className="border-t">
-                        <div ref={aiResponseRef} />
-                        <h1 className="mt-4 text-center text-lg font-bold">
-                          Roast by AI 🤖
-                        </h1>
-                        <RoastAI
+                      {showRoast && (
+                        <div className="border-t">
+                          <div ref={aiResponseRef} />
+                          <h1 className="mt-4 text-center text-lg font-bold">
+                            Roast by AI 🤖
+                          </h1>
+                          <RoastAI
+                            studentData={studentData}
+                            onRoastGenerated={handleScrollToResponse}
+                          />
+                        </div>
+                      )}
+
+                      <div ref={predictionRef} className="mt-4">
+                        <SGPAPrediction
                           studentData={studentData}
-                          onRoastGenerated={handleScrollToResponse}
+                          onReload={handleReload}
                         />
                       </div>
-                    )}
 
-                    <div ref={predictionRef} className="mt-4">
-                      <SGPAPrediction
-                        studentData={studentData}
-                        onReload={handleReload}
-                      />
-                    </div>
-
-                    <div className="my-4 flex justify-center gap-4">
-                      <button
-                        onClick={setShowCompliment.bind(null, (prev) => !prev)}
-                        className="rounded bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
-                        disabled={isLoading}
-                      >
-                        {showCompliment ? 'Hide Compliment' : 'Show Compliment'}
-                      </button>
-                    </div>
-
-                    {showCompliment && (
-                      <div className="border-t">
-                        <h1 className="mt-4 text-center text-lg font-bold">
-                          Compliment by AI 🤖
-                        </h1>
-                        <ComplimentAI studentData={studentData} />
+                      <div className="my-4 flex justify-center gap-4">
+                        <button
+                          onClick={setShowCompliment.bind(
+                            null,
+                            (prev) => !prev
+                          )}
+                          className="rounded bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+                          disabled={isLoading}
+                        >
+                          {showCompliment
+                            ? 'Hide Compliment'
+                            : 'Show Compliment'}
+                        </button>
                       </div>
-                    )}
-                  </>
-                )}
+
+                      {showCompliment && (
+                        <div className="border-t">
+                          <h1 className="mt-4 text-center text-lg font-bold">
+                            Compliment by AI 🤖
+                          </h1>
+                          <ComplimentAI studentData={studentData} />
+                        </div>
+                      )}
+                    </>
+                  )}
                 </ErrorBoundary>
                 <div className="mt-4 flex justify-center gap-4">
                   <button
