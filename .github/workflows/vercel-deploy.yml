@@ -49,3 +49,8 @@ jobs:
             echo "Unexpected response body, deployment might not have triggered."
             exit 1
           fi
+
+      - name: Get commit author
+        run: |
+          AUTHOR=$(git log -1 --pretty=format:'%an <%ae>')
+          echo "author=$AUTHOR" >> "$GITHUB_OUTPUT"

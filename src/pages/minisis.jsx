@@ -343,6 +343,14 @@ const NewMobileCourseCard = ({ course }) => {
 }
 
 const GradesTable = ({ studentData }) => {
+  if (!studentData?.courses?.length) {
+    return (
+      <div className="mt-8 hidden items-center md:block">
+        <div className="text-center text-gray-500">No course data available</div>
+      </div>
+    );
+  }
+
   const gradeThresholds = [
     { label: 'O', target: 90, header: 'O (≥90)' },
     { label: 'A+', target: 80, header: 'A+ (≥80)' },
@@ -1111,38 +1119,8 @@ function HomePage() {
                                 checked={enabled}
                                 onChange={(newValue) => {
                                   setEnabled(newValue)
-                                  localStorage.setItem(
-                                    'semesterToggle',
-                                    newValue
-                                  )
-                                  const newEndpoint = newValue
-                                    ? 'newparentseven'
-                                    : 'parentsodd'
-                                  const apiurl = `https://reconnect-msrit.vercel.app/sis?endpoint=${newEndpoint}&usn=${usn}&dob=${dob}`
-                                  setIsLoading(true)
-                                  fetch(apiurl)
-                                    .then((response) => response.json())
-                                    .then((data) => {
-                                      setStudentData(data)
-                                      localStorage.setItem(
-                                        'studentData',
-                                        JSON.stringify(data)
-                                      )
-                                      toast.success(
-                                        `Switched to ${
-                                          newValue ? 'Even' : 'Odd'
-                                        } Semester`
-                                      )
-                                    })
-                                    .catch((err) => {
-                                      toast.error(
-                                        'Failed to fetch semester data'
-                                      )
-                                      console.error(err)
-                                    })
-                                    .finally(() => {
-                                      setIsLoading(false)
-                                    })
+                                  localStorage.setItem('semesterToggle', newValue)
+                                  handleFetchData(usn, dob)
                                 }}
                                 className={`${
                                   enabled ? 'bg-blue-600' : 'bg-gray-400'
@@ -1219,9 +1197,13 @@ function HomePage() {
                         <h2 className="text-center text-lg font-bold">
                           Required SEE Marks (min) for Respective Grades
                         </h2>
-                        {studentData.courses.map((course, index) => (
+                        {studentData?.courses?.length > 0 ? (
+                          studentData.courses.map((course, index) => (
                           <NewMobileCourseCard key={index} course={course} />
-                        ))}
+                          ))
+                        ) : (
+                          <div className="text-center text-gray-500">No course data available</div>
+                        )}
                       </div>
                       <GradesTable studentData={studentData} />
                     </div>
