@@ -718,6 +718,9 @@ function HomePage() {
     if (endpointToUse !== currentEndpoint) {
       setSelectedEndpoint(endpointToUse)
     }
+    // Update the usn and dob state
+    setUsn(historyEntry.usn)
+    setDob(historyEntry.dob)
     await handleFetchData(historyEntry.usn, historyEntry.dob, endpointToUse)
   }
   
