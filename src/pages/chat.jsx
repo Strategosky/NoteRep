@@ -48,43 +48,45 @@ function ChatProvider({ children }) {
 
   useEffect(() => {
     const initChatRooms = async () => {
-      if (initialized) return;
-      setInitialized(true);
-      const chatRoomsRef = ref(db, 'chatRooms');
+      if (initialized) return
+      setInitialized(true)
+      const chatRoomsRef = ref(db, 'chatRooms')
       onValue(
         chatRoomsRef,
         async (snapshot) => {
-          const existingRooms = snapshot.val() || {};
+          const existingRooms = snapshot.val() || {}
           try {
             const roomDescriptions = {
-              'general-anon': 'Discuss anything related to studies and campus life',
+              'general-anon':
+                'Discuss anything related to studies and campus life',
               'off-topic': 'Chat about anything outside academics',
               'study-group': 'Collaborate on assignments and projects',
-            };
+            }
             for (const room of rooms) {
               if (!existingRooms[room.id]) {
-                const roomRef = ref(db, `chatRooms/${room.id}`);
-                const description = room.type === 'authenticated' 
-                  ? 'General chat for authenticated users' 
-                  : roomDescriptions[room.id] || 'General chat for everyone';
+                const roomRef = ref(db, `chatRooms/${room.id}`)
+                const description =
+                  room.type === 'authenticated'
+                    ? 'General chat for authenticated users'
+                    : roomDescriptions[room.id] || 'General chat for everyone'
                 await set(roomRef, {
                   name: room.name,
                   type: room.type,
                   description,
                   createdAt: Date.now(),
-                });
-                console.log(`Initialized room: ${room.name}`);
+                })
+                console.log(`Initialized room: ${room.name}`)
               }
             }
-            console.log('Chat room initialization complete.');
+            console.log('Chat room initialization complete.')
           } catch (error) {
-            console.error('Error initializing chat rooms:', error);
+            console.error('Error initializing chat rooms:', error)
           }
         },
         { onlyOnce: true }
-      );
-    };
-    initChatRooms();
+      )
+    }
+    initChatRooms()
   }, [initialized, rooms])
 
   useEffect(() => {
@@ -123,42 +125,42 @@ function ChatProvider({ children }) {
 }
 
 function ChatRoomList({ rooms, activePageUsers }) {
-  const router = useRouter();
-  const [roomDetails, setRoomDetails] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter()
+  const [roomDetails, setRoomDetails] = useState({})
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setIsLoading(true);
+    setIsLoading(true)
     // Fetch room details from Firebase to display active users per room
-    const roomDetailsListener = {};
+    const roomDetailsListener = {}
     rooms.forEach((room) => {
-      const roomRef = ref(db, `chatRooms/${room.id}`);
+      const roomRef = ref(db, `chatRooms/${room.id}`)
       roomDetailsListener[room.id] = onValue(roomRef, (snapshot) => {
-        const data = snapshot.val();
+        const data = snapshot.val()
         if (data) {
-          setRoomDetails((prev) => ({ ...prev, [room.id]: data }));
+          setRoomDetails((prev) => ({ ...prev, [room.id]: data }))
         }
-        setIsLoading(false);
-      });
-    });
+        setIsLoading(false)
+      })
+    })
     return () => {
-      Object.values(roomDetailsListener).forEach((unsubscribe) => unsubscribe());
-      setIsLoading(false);
-    };
-  }, [rooms]);
+      Object.values(roomDetailsListener).forEach((unsubscribe) => unsubscribe())
+      setIsLoading(false)
+    }
+  }, [rooms])
 
   return (
-    <div className="w-full border-b border-gray-300 bg-gradient-to-r from-blue-100 to-indigo-100 p-6 dark:border-gray-700 dark:from-blue-900 dark:to-indigo-900">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          NoteRep Chat Rooms
+    <div className="w-full border-b border-gray-300 bg-gradient-to-r from-blue-100 to-indigo-100 p-3 dark:border-gray-700 dark:from-blue-900 dark:to-indigo-900 sm:p-6">
+      <div className="mb-3 flex flex-col items-start justify-between space-y-2 sm:mb-4 sm:flex-row sm:items-center sm:space-y-0">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
+          NoteRep Real-Time Chat Rooms
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
+        <p className="text-xs text-gray-600 dark:text-gray-300 sm:text-sm">
           Active Users: <span className="font-semibold">{activePageUsers}</span>
         </p>
       </div>
       {isLoading ? (
-        <div className="text-center text-gray-500 dark:text-gray-400 py-4">
+        <div className="py-4 text-center text-gray-500 dark:text-gray-400">
           Loading chat rooms...
         </div>
       ) : (
@@ -166,14 +168,14 @@ function ChatRoomList({ rooms, activePageUsers }) {
           {rooms.map((room) => (
             <button
               key={room.id}
-              className="group relative flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-700 dark:text-white dark:hover:shadow-lg"
+              className="group relative flex flex-col rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-all duration-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-700 dark:text-white dark:hover:shadow-lg sm:rounded-xl sm:p-4"
               onClick={() => router.push(`/chat/${room.id}`)}
             >
               <span className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
                 {room.name}
               </span>
               <span className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {roomDetails[room.id]?.description || "Join this chat room!"}
+                {roomDetails[room.id]?.description || 'Join this chat room!'}
               </span>
               <div className="mt-2 flex justify-center text-xs text-gray-500 dark:text-gray-400">
                 <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-800 dark:bg-green-900 dark:text-green-300">
@@ -188,28 +190,29 @@ function ChatRoomList({ rooms, activePageUsers }) {
         </div>
       )}
     </div>
-  );
+  )
 }
 
 function ChatWindow({ user }) {
-  const router = useRouter();
-  const isAuthenticated = !!user;
+  const router = useRouter()
+  const isAuthenticated = !!user
 
   const handleLoginRedirect = () => {
-    router.push('/login');
-  };
+    router.push('/login')
+  }
 
   return (
-    <div className="flex w-full flex-1 flex-col items-center justify-center bg-gray-50 p-8 dark:bg-gray-800">
+    <div className="flex w-full flex-1 flex-col items-center justify-center bg-gray-50 p-4 dark:bg-gray-800 sm:p-8">
       <div className="max-w-md text-center">
-        <h3 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+        <h3 className="mb-3 text-xl font-semibold text-gray-900 dark:text-white sm:mb-4 sm:text-2xl">
           Welcome to NoteRep Chat
         </h3>
-        <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
-          Connect with fellow students, discuss topics, and collaborate in real-time. Select a chat room above to get started.
+        <p className="mb-4 text-base text-gray-600 dark:text-gray-300 sm:mb-6 sm:text-lg">
+          Connect with fellow students, discuss topics, and collaborate in
+          real-time. Select a chat room above to get started.
         </p>
         {!isAuthenticated ? (
-          <div className="mt-6 animate-fade-in">
+          <div className="animate-fade-in mt-6">
             <p className="mb-4 text-base text-gray-500 dark:text-gray-400">
               Sign in to unlock full chat features and join the conversation.
             </p>
@@ -227,7 +230,7 @@ function ChatWindow({ user }) {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 export default function Chat() {
@@ -284,15 +287,15 @@ export default function Chat() {
       </Head>
       <main className="flex min-h-screen flex-col bg-indigo-50 dark:bg-gray-900">
         <CompactHeader />
-        <section className="flex h-screen flex-col py-3 sm:py-10">
-          <div className="container mx-auto flex max-w-5xl flex-1 flex-col p-4">
-            <h1 className="mb-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+        <section className="flex flex-1 flex-col py-2 sm:py-6">
+          <div className="container mx-auto flex max-w-5xl flex-1 flex-col px-2 sm:px-4">
+            <h1 className="mb-4 text-center text-2xl font-bold text-gray-900 dark:text-white sm:mb-6 sm:text-3xl">
               NoteRep Live Chat
             </h1>
             <ChatProvider>
               <ChatContext.Consumer>
                 {({ rooms, activePageUsers, user }) => (
-                  <div className="flex h-[85vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-800">
+                  <div className="flex flex-1 flex-col overflow-hidden rounded-xl bg-white shadow-xl dark:bg-gray-800 sm:rounded-2xl sm:shadow-2xl">
                     <ChatRoomList
                       rooms={rooms}
                       activePageUsers={activePageUsers}
