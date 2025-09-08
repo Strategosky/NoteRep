@@ -16,68 +16,6 @@ import { Counter } from '@/components/Calendar'
 import { GCalendar } from '@/components/GoogleCalendar'
 import { Button } from '@/components/Button'
 
-const subjects6 = [
-  {
-    Day: 'Monday',
-    subject: [
-      'DL Tut',
-      'DL Tut',
-      'Entrepreneurship',
-      'Cloud Computing',
-      '-',
-      'Elective',
-      'Mini Project',
-      'Mini Project',
-    ],
-  },
-  {
-    Day: 'Tuesday',
-    subject: [
-      'Deep Learning',
-      'Cloud Computing',
-      'Cryptography',
-      'Entrepreneurship',
-      '-',
-      'Elective',
-      'Mini Project',
-      'Mini Project',
-    ],
-  },
-  {
-    Day: 'Wednesday',
-    subject: [
-      'Cloud Computing',
-      'Deep Learning',
-      'Cryptography',
-      'Entrepreneurship',
-      '-',
-      'Elective',
-      'Mini Project',
-      'Mini Project',
-    ],
-  },
-  {
-    Day: 'Thursday',
-    subject: [
-      'Deep Learning',
-      'Big Data Lab',
-      'Big Data Lab',
-      'Big Data Lab',
-      '-',
-      'Cloud Computing',
-      'Cryptography',
-      '*',
-    ],
-  },
-  {
-    Day: 'Friday',
-    subject: ['Cryptography', 'DL Lab', 'DL Lab', 'DL Lab', '-', '*', '*', '*'],
-  },
-  {
-    Day: 'Saturday',
-    subject: ['Chill', 'Madi', '-', '-', '-', '-', '-', '-'],
-  },
-]
 const subjects7 = [
   {
     Day: 'Monday',
