@@ -155,6 +155,14 @@ const cseaimlsem7 = [
     description: '(3:0:0) CIE731',
     link: 'https://drive.google.com/drive/folders/1UVY0zGayzSeiPB6mY7aZOJlnNmZeOsEb?usp=sharing',
     otherlink: '/links',
+    tag: 'archived',
+    archive: true,
+  },
+  {
+    title: '4 Full Stack Development',
+    description: '(3:0:0) CIE733',
+    link: 'https://drive.google.com/drive/folders/1IdqLJffstiIB4PyMpdzgkG-LghuWb8fM?usp=drive_link',
+    otherlink: '/links',
     tag: '',
   },
   {

@@ -69,7 +69,7 @@ let time = newDate.toLocaleString('en-US', {
 })
 
 function get_time() {
-  console.log('time: ', time)
+  // console.log('time: ', time)
   if (time >= '09:00' && time <= '09:55') {
     return 0
   } else if (time >= '09:55' && time <= '10:50') {

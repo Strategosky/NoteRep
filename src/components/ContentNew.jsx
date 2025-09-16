@@ -83,7 +83,13 @@ export function ContentNew(props) {
           role="list"
           className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-6 text-sm sm:mt-10 sm:grid-cols-2 md:gap-y-10 lg:max-w-none lg:grid-cols-3 lg:items-center"
         >
-          {drive.map((item, index) => (
+          {drive
+            .sort((a, b) => {
+              if (a.archive === true && b.archive !== true) return 1;
+              if (a.archive !== true && b.archive === true) return -1;
+              return 0;
+            })
+            .map((item, index) => (
             <li
               key={index}
               className="rounded-xl bg-gradient-to-r from-green-300 via-blue-300 to-purple-600 p-0.5 shadow-lg transition hover:shadow-sm dark:shadow-5xl"
