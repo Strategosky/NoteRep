@@ -43,11 +43,11 @@ export default function Home() {
         >
           <Container>
             <h1 className="text-center font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Updated 6th Sem Syllabus for CSE (AI & ML)
+              7th Sem Syllabus for CSE (AI & ML)
             </h1>
             <div className="flex justify-center pt-10">
               <ButtonLink
-                href="/documents/AIML_SEM6_22CI.pdf"
+                href="/documents/7th_Sem_CSEAIML_2022_Batch.pdf"
                 rel="noreferrer"
                 target="_blank"
                 className="rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500"
