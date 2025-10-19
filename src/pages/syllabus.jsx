@@ -60,7 +60,7 @@ export default function Home() {
             {/* https://drive.google.com/file/d/1N_ttI4ut41bQ6gAYiZX9HSoOa7nmjz1l/view?usp=sharing */}
             <div className="flex justify-center">
               <iframe
-                src="https://drive.google.com/file/d/1N_ttI4ut41bQ6gAYiZX9HSoOa7nmjz1l/preview"
+                src="https://drive.google.com/file/d/1atnG_ZHSUvxUKCZM1az56YpLkdRostp8/preview"
                 height="1024"
                 allow="autoplay"
                 frameborder="0"
