@@ -166,6 +166,12 @@ const cseaimlsem7 = [
     tag: '',
   },
   {
+    title: 'MULTICORE ARCHITECTURE and PROGRAMMING Lab',
+    description: '(0:0:1) CIL73',
+    link: 'https://drive.google.com/drive/folders/1IdqLJffstiIB4PyMpdzgkG-LghuWb8fM?usp=sharing',
+    github: '',
+  },
+  {
     title: 'Containerization Lab',
     description: '(0:0:1) CIL74',
     link: 'https://drive.google.com/drive/folders/1XeWhwFc96ik8bViUdaz0GssGZ1pFf9Yd?usp=sharing',
